@@ -146,6 +146,9 @@ def cleanup_in_plone52(context=None):
     cleanUpSkinsTool(portal)
     api.content.rename(portal['index_html'], 'startseite')
     portal.setDefaultPage('startseite')
+    portal_properties = api.portal.get_tool('portal_properties')
+    portal_properties.manage_delObjects(['quickupload_properties'])
+    portal_properties.manage_delObjects(['imaging_properties'])
     pack_database()
 
 
