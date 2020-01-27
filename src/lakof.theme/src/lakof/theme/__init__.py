@@ -18,6 +18,7 @@ class IBBB(Interface):
 
 try:
     from wildcard.foldercontents.interfaces import ILayer
+
     ILayer  # noqa
 except ImportError:
     alias_module('wildcard.foldercontents.interfaces.ILayer', IBBB)
@@ -25,6 +26,7 @@ except ImportError:
 
 try:
     from ftw.footer.interfaces import IFtwFooterLayer
+
     IFtwFooterLayer  # noqa
 except ImportError:
     alias_module('ftw.footer.interfaces.IFtwFooterLayer', IBBB)

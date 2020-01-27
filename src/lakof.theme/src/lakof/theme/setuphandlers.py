@@ -6,7 +6,6 @@ from zope.interface import implementer
 
 @implementer(INonInstallable)
 class HiddenProfiles(object):
-
     def getNonInstallableProfiles(self):
         """
         Prevents all profiles but 'plone-content' from showing up in the
@@ -15,7 +14,6 @@ class HiddenProfiles(object):
         return [
             u'lakof.theme:uninstall',
         ]
-
 
 
 def post_install(context):

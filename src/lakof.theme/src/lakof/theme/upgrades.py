@@ -15,6 +15,7 @@ from zope.globalrequest import getRequest
 import logging
 import transaction
 
+
 log = logging.getLogger(__name__)
 
 
@@ -30,8 +31,7 @@ def prepare_plone5_upgrade(context=None):
     portal_setup = api.portal.get_tool('portal_setup')
     portal_properties = api.portal.get_tool('portal_properties')
 
-    to_delete = [
-    ]
+    to_delete = []
     for path in to_delete:
         try:
             obj = api.content.get(path=path)
@@ -79,7 +79,8 @@ def prepare_plone5_upgrade(context=None):
 
     log.info('run uninstall self')
     portal_setup.runAllImportStepsFromProfile(
-        'profile-lakof.theme:uninstall', purge_old=False)
+        'profile-lakof.theme:uninstall', purge_old=False
+    )
 
 
 def remove_overrides(context=None):
@@ -99,6 +100,7 @@ def remove_overrides(context=None):
 
 def release_all_webdav_locks(context=None):
     from Products.CMFPlone.utils import base_hasattr
+
     portal = api.portal.get()
 
     def unlock(obj, path):
@@ -126,6 +128,7 @@ def disable_theme(context=None):
     """
     THEME_NAME = 'plonetheme.onegov'
     from plone.app.theming.utils import applyTheme
+
     portal_skins = api.portal.get_tool('portal_skins')
     qi = api.portal.get_tool('portal_quickinstaller')
     if qi.isProductInstalled(THEME_NAME):
@@ -239,11 +242,18 @@ def fix_portlets_for(obj):
         'search_base_uid',
         'uid',
     ]
-    if getattr(obj.aq_base, 'getLayout', None) is not None and obj.getLayout() is not None:
+    if (
+        getattr(obj.aq_base, 'getLayout', None) is not None
+        and obj.getLayout() is not None
+    ):
         view = obj.restrictedTraverse(obj.getLayout())
     else:
         view = obj.restrictedTraverse('@@view')
-    for manager_name in ['plone.leftcolumn', 'plone.rightcolumn', 'plone.footerportlets']:
+    for manager_name in [
+        'plone.leftcolumn',
+        'plone.rightcolumn',
+        'plone.footerportlets',
+    ]:
         manager = queryUtility(IPortletManager, name=manager_name, context=obj)
         if not manager:
             continue
@@ -252,7 +262,17 @@ def fix_portlets_for(obj):
             continue
         for key, assignment in mappings.items():
             for attr in attrs_to_fix:
-                if getattr(assignment, attr, None) is not None and isinstance(getattr(assignment, attr), ComputedAttribute):
+                if getattr(assignment, attr, None) is not None and isinstance(
+                    getattr(assignment, attr), ComputedAttribute
+                ):
                     setattr(assignment, attr, None)
-                    log.info('Reset {} for portlet {} assigned at {} in {}'.format(attr, key, obj.absolute_url(), manager_name))  # noqa: E501
-                    log.info('You may need to configure it manually at {}/@@manage-portlets'.format(obj.absolute_url()))  # noqa: E501
+                    log.info(
+                        'Reset {} for portlet {} assigned at {} in {}'.format(
+                            attr, key, obj.absolute_url(), manager_name
+                        )
+                    )  # noqa: E501
+                    log.info(
+                        'You may need to configure it manually at {}/@@manage-portlets'.format(
+                            obj.absolute_url()
+                        )
+                    )  # noqa: E501
