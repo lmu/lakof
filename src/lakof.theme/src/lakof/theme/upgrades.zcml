@@ -23,7 +23,7 @@
   <genericsetup:upgradeStep
     source="1002"
     destination="1003"
-    title="Cleanup after Pyton 3 Migration: Reinstall and rebuild catalog"
+    title="Cleanup after Python 3 Migration: Reinstall and rebuild catalog"
     description=""
     profile="lakof.theme:default"
     handler=".upgrades.cleanup_afterpy3_migration"
@@ -32,7 +32,7 @@
   <genericsetup:upgradeStep
     source="1003"
     destination="1004"
-    title="Cleanup after Pyton 3 Migration: Fix portlets"
+    title="Cleanup after Python 3 Migration: Fix portlets"
     description=""
     profile="lakof.theme:default"
     handler=".upgrades.fix_portlets"
