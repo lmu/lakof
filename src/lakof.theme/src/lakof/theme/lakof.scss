@@ -1,0 +1,302 @@
+.logoRow {
+    min-height: 0 !important;
+}
+
+body {
+    color: #111;
+}
+
+.newsImageContainer {
+    float: left;
+    margin-right: 15px;
+    margin-bottom: 2px;
+}
+
+a#portal-logo {
+
+    height: 60px;
+    line-height: 60px;
+    display: block;
+    white-space: nowrap;
+
+    margin: 0;
+    margin-top: 5px;
+    margin-bottom: 1px;
+    padding-left: 60px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    background-image: url('%PORTAL_URL%/++resource++lakof.theme/lakof_logo.png');
+    background-size: 55px auto;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+
+    * {
+        vertical-align: baseline;
+        display: inline-block;
+    }
+
+    span#logo_abbr_title {
+        font-size: 72px;
+        text-transform: capitalize;
+    }
+
+    span#logo_full_title {
+        line-height: 20px;
+        font-size: 16px;
+
+        margin-left: 5px;
+
+        span {
+            display: block;
+        }
+    }
+}
+
+.timezone {
+    display: none;
+}
+
+a#portal-logo:hover {
+    text-decoration: none;
+}
+
+h1 {
+    color: #8a0000;
+}
+
+h1.documentFirstHeading {
+    margin-bottom: 15px;
+}
+
+@media screen and (max-width: 1200px) {
+    a#portal-logo { 
+
+    }
+}
+
+@media screen and (max-width: 979px) {
+    a#portal-logo { 
+        
+    }
+}
+
+@media screen and (max-width: 769px) {
+    .headerDelimiterWrapper {
+        margin-top: 0 !important;
+    }
+
+    a#portal-logo { 
+        height: 36px;
+        line-height: 36px;
+
+        padding-left: 35px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        background-size: 30px auto;
+
+        span#logo_abbr_title {
+            font-size: 42px;
+        }
+
+        span#logo_full_title {
+            font-size: 10px;
+            line-height: 12px;
+        }
+
+    } 
+
+    #portal-topactions ul {
+        padding-top: 0.25em !important;
+        padding: 0.25em !important;
+    }
+
+    #portal-breadcrumbs {
+        display: block !important;
+    }
+
+    #portal-personaltools dt#anon-personalbar {
+        display: none !important;
+    }
+
+    h1 {
+        font-size: 26px !important;
+        line-height: 1.5em !important;
+    }
+}
+
+@media screen and (max-width: 530px) {
+    a#portal-logo span#logo_full_title {
+        display: none; 
+    }
+}
+
+@media screen and (max-width: 320px) {
+    a#portal-logo { 
+        margin-top: 35px;
+    }
+}
+
+#edit-bar {
+    background-color: #75ad0a !important;
+    color: #FFF;
+
+    ul {
+        background-color: #75ad0a !important;
+        color: #FFF;
+    }
+
+    a {
+        color: #FFF !important;
+        border-radius: 10px 10px 0 0;
+        -webkit-border-radius: 10px 10px 0 0;
+        -moz-border-radius: 10px 10px 0 0;
+    }
+
+
+    .activated a, 
+    li.selected a, 
+    li a:hover {
+        background-color: #fcfcfc;
+        color: #000 !important;
+        font-weight: bold;
+    }
+}
+
+.tileItem > a {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 2px;
+}
+
+a[target="_blank"]:before, 
+#portal-topactions ul a[target="_blank"]:before, 
+span.link-external a:before, 
+a.external-link:before {
+    content: none !important;
+}
+
+#portal-topactions {
+    min-height: 0.2em !important;
+}
+
+#footer {
+    color: #8a0000 !important;
+
+    a {
+        color: #8a0000 !important;
+    }
+
+    .portlet {
+        border-left-color: #8a0000 !important;
+        height: 185px;
+    }
+
+    dl.portlet dt.portletHeader {
+        font-size: 14px;
+        min-height: 40px;
+    }
+}
+
+#header {
+    
+    .width-12 {
+        width: 97.00499% !important;
+    }
+
+    .searchBoxWrapper {
+        margin-top: -40px;
+
+        #portal-searchbox {
+            z-index: 10;
+        }
+    }
+
+    #portal-globalnav > li {
+        background-color: #8a0000 !important;
+        margin-bottom: 0;
+        padding-bottom: 5px;
+        padding-top: 5px;
+        padding-left: 2px;
+        padding-right: 2px;
+        border-right: 1px solid #fff;
+    }
+
+    #portal-globalnav > li > .wrapper > a {
+        color: #FFF;
+    }
+
+    #portal-globalnav:hover > li > .wrapper > a:hover {
+        color: #F0F0F0;
+        border-bottom: 3px solid #F0F0F0;
+    }
+
+    #portal-globalnav > li.flyoutActive > .wrapper > a {
+        color: #8a0000;
+        border-bottom: 5px solid #8a0000;
+    } 
+
+    #portal-globalnav:hover > li.flyoutActive > .wrapper > a:hover {
+        color: #8a0000;
+        border-bottom: 5px solid #8a0000;
+    }   
+
+    #portal-globalnav > li > .wrapper > a:after {
+        color: #FFF !important;
+    }
+
+    #portal-globalnav > li.selected > .wrapper > a {
+        color: #F0F0F0;
+        border-bottom: 3px solid #F0F0F0;
+    }
+
+    #portal-globalnav:hover > li.selected > .wrapper > a:hover {
+        color: #F0F0F0;
+        border-bottom: 3px solid #f36525;
+    }  
+
+    #portal-globalnav > li.flyoutActive.selected > .wrapper > a {
+        color: #8a0000;
+        border-bottom: 3px solid #8a0000;
+    } 
+
+    #portal-globalnav:hover > li.flyoutActive.selected > .wrapper > a:hover {
+        color: #8a0000;
+        border-bottom: 3px solid #8a0000;
+    } 
+
+    #portal-globalnav > li.selected > .wrapper > a:after {
+        color: #F0F0F0 !important;
+    }
+
+    #portal-globalnav li:first-child .wrapper {
+        padding-left: 15px;
+    }
+}
+
+#column-navigation .portletContextNavigation ul li.parent {
+    display: none !important;
+}
+
+.site-Plone.section-index_html div#content-core img {
+    height: 170px;
+    width: auto;
+}
+
+.site-Plone div#content-core p {
+    font-size: 110%;
+}
+
+.portletEvents .portletItemDetails span {
+    display: none;
+}
+.portletEvents .portletItemDetails span.location {
+    display: inline-block;
+}
+
+.portletEvents .portletFooter {
+    display: none;
+}
+
+
+

@@ -1,0 +1,41 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
+
+  <genericsetup:upgradeStep
+    source="1000"
+    destination="1001"
+    title="Prepare Plone 5 Upgrade"
+    description=""
+    profile="lakof.theme:default"
+    handler=".upgrades.prepare_plone5_upgrade"
+    />
+
+  <genericsetup:upgradeStep
+    source="1001"
+    destination="1002"
+    title="Cleanup after Plone 5 Upgrade"
+    description=""
+    profile="lakof.theme:default"
+    handler=".upgrades.cleanup_in_plone52"
+    />
+
+  <genericsetup:upgradeStep
+    source="1002"
+    destination="1003"
+    title="Cleanup after Pyton 3 Migration: Reinstall and rebuild catalog"
+    description=""
+    profile="lakof.theme:default"
+    handler=".upgrades.cleanup_afterpy3_migration"
+    />
+
+  <genericsetup:upgradeStep
+    source="1003"
+    destination="1004"
+    title="Cleanup after Pyton 3 Migration: Fix portlets"
+    description=""
+    profile="lakof.theme:default"
+    handler=".upgrades.fix_portlets"
+    />
+
+</configure>

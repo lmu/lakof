@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<object name="portal_actions" meta_type="Plone Actions Tool"
+   xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+
+  <object name="top_actions" meta_type="CMF Action Category" remove="True">
+    <object name="onegov" meta_type="CMF Action" i18n:domain="lakof.theme">
+      <property name="visible">False</property>
+    </object>
+    <object name="bukof" meta_type="CMF Action" i18n:domain="lakof.theme">
+      <property name="title">BuKoF</property>
+      <property name="description">Bundeskonferenz der Frauen- und Gleichstellungsbeauftragten an Hochschulen</property>
+      <property name="url_expr">string:http://www.bukof.de/</property>
+      <property name="visible">True</property>
+    </object>
+    <object name="lmu" meta_type="CMF Action" >
+      <property name="title">LMU</property>
+      <property name="description">Ludwig-Maximilians-Universität München</property>
+      <property name="url_expr">string:http://www.lmu.de/</property>
+       <property name="visible">True</property>
+    </object>
+  </object>
+
+</object>
