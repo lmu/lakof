@@ -5,15 +5,10 @@ from plone.app.upgrade.utils import cleanUpSkinsTool
 from plone.app.upgrade.utils import loadMigrationProfile
 from plone.portlets.interfaces import IPortletAssignmentMapping
 from plone.portlets.interfaces import IPortletManager
-from zExceptions import BadRequest
-from zope.component import getMultiAdapter
-from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
-from zope.globalrequest import getRequest
 
 import logging
-import transaction
 
 
 log = logging.getLogger(__name__)
@@ -24,12 +19,9 @@ def prepare_plone5_upgrade(context=None):
     release_all_webdav_locks()
     remove_all_revisions()
     disable_theme()
-    portal = api.portal.get()
     catalog = api.portal.get_tool('portal_catalog')
     qi = api.portal.get_tool('portal_quickinstaller')
-    portal_skins = api.portal.get_tool('portal_skins')
     portal_setup = api.portal.get_tool('portal_setup')
-    portal_properties = api.portal.get_tool('portal_properties')
 
     to_delete = []
     for path in to_delete:
@@ -38,7 +30,7 @@ def prepare_plone5_upgrade(context=None):
             if obj is not None:
                 api.content.delete(obj, check_linkintegrity=False)
             log.info('Deleted %s' % path)
-        except:
+        except:  # noqa: F401
             continue
 
     # Remove ftw.slider
@@ -126,20 +118,20 @@ def disable_theme(context=None):
     """Disable a custom diazo theme and enable sunburst.
     Useful for cleaning up a site in Plone 4
     """
-    THEME_NAME = 'plonetheme.onegov'
+    theme_name = 'plonetheme.onegov'
     from plone.app.theming.utils import applyTheme
 
     portal_skins = api.portal.get_tool('portal_skins')
     qi = api.portal.get_tool('portal_quickinstaller')
-    if qi.isProductInstalled(THEME_NAME):
-        log.info('Uninstalling {}'.format(THEME_NAME))
-        qi.uninstallProducts([THEME_NAME])
+    if qi.isProductInstalled(theme_name):
+        log.info('Uninstalling {}'.format(theme_name))
+        qi.uninstallProducts([theme_name])
     log.info('Disabling all diazo themes')
     applyTheme(None)
     log.info('Enabled Sunburst Theme')
     portal_skins.default_skin = 'Sunburst Theme'
-    if THEME_NAME in portal_skins.getSkinSelections():
-        portal_skins.manage_skinLayers([THEME_NAME], del_skin=True)
+    if theme_name in portal_skins.getSkinSelections():
+        portal_skins.manage_skinLayers([theme_name], del_skin=True)
 
 
 def cleanup_in_plone52(context=None):
@@ -158,8 +150,6 @@ def cleanup_in_plone52(context=None):
 def uninstall_archetypes(context=None):
     portal_setup = api.portal.get_tool('portal_setup')
     loadMigrationProfile(portal_setup, 'profile-Products.ATContentTypes:uninstall')
-    portal = api.portal.get()
-    request = getRequest()
     qi = api.portal.get_tool('portal_quickinstaller')
     addons = [
         'Archtypes',
@@ -242,13 +232,6 @@ def fix_portlets_for(obj):
         'search_base_uid',
         'uid',
     ]
-    if (
-        getattr(obj.aq_base, 'getLayout', None) is not None
-        and obj.getLayout() is not None
-    ):
-        view = obj.restrictedTraverse(obj.getLayout())
-    else:
-        view = obj.restrictedTraverse('@@view')
     for manager_name in [
         'plone.leftcolumn',
         'plone.rightcolumn',
