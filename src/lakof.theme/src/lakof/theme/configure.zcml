@@ -9,6 +9,13 @@
   <include package=".browser" />
   <include file="upgrades.zcml" />
 
+    <!-- Publish static files -->
+  <plone:static
+      name="lakof.theme"
+      type="theme"
+      directory="theme_resources/theme/lakof.theme"
+      />
+
   <genericsetup:registerProfile
       name="default"
       title="lakof.theme"
