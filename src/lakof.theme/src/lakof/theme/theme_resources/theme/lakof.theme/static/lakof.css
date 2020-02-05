@@ -1,0 +1,112 @@
+
+/* Navigation */
+#mainnavigation .plone-navbar {
+    background-color: #666;
+}
+
+#mainnavigation .plone-nav li ul li a {
+    background-color: #666;
+}
+
+#mainnavigation .plone-navbar-nav .has_subtree.inPath > a,
+#mainnavigation .plone-navbar-nav .has_subtree.inPath > a:hover,
+#mainnavigation .plone-navbar-nav .has_subtree.inPath > a:focus {
+    background-color: #888;
+}
+
+#mainnavigation .plone-navbar-nav .current > a,
+#mainnavigation .plone-navbar-nav .selected > a,
+#mainnavigation .plone-navbar-nav .current > a:hover,
+#mainnavigation .plone-navbar-nav .selected > a:hover,
+#mainnavigation .plone-navbar-nav .current > a:focus,
+#mainnavigation .plone-navbar-nav .selected > a:focus {
+    background-color: #888;
+}
+
+#mainnavigation .plone-nav li a:hover,
+#mainnavigation .plone-nav li a:focus {
+    background-color: #888;
+}
+
+/* Mobile Navigation*/
+#mainnavigation .plone-nav li label::after {
+    background-color: #aaa;
+}
+
+@media (min-width: 768px) {
+    #mainnavigation .plone-nav li label::after {
+        background-color: transparent;
+    }
+}
+
+/* Content */
+
+#content-header {
+    height: 100px;
+}
+
+/* Below content */
+
+.documentActions ul {
+    list-style: none;
+    text-align: right;
+}
+
+.documentActions li {
+    display: inline-block;
+    padding-left: 10px;
+}
+
+/* Responsive fixes */
+
+.modal-image img {
+    max-width: 100%;
+}
+
+
+
+/* Footer */
+
+#portal-footer-wrapper {
+    padding: 1px !important;
+    margin-bottom: 10px;
+}
+
+#category {
+    text-align: right;
+}
+
+.pfooter {
+    margin-left: 10px;
+    float: left;
+}
+
+#portal-siteactions {
+    float: right;
+    margin-right: 10px;
+}
+
+
+/* Tables without a class should look like .listing tables */
+table > tbody > tr:nth-child(2n+1) > td,
+table > tbody > tr:nth-child(2n+1) > th {
+    background-color: #f6f6f6;
+}
+
+table > thead > tr > th,
+table > tbody > tr > th,
+table > tfoot > tr > th,
+table > thead > tr > td,
+table > tbody > tr > td,
+table > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 0 solid #e5e5e5;
+    border-collapse: collapse;
+}
+
+/* Fix invisible tables */
+table.invisible {
+    visibility: visible;
+}
