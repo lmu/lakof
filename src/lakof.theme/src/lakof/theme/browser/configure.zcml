@@ -11,12 +11,7 @@
       layer="lakof.theme.interfaces.ICustomTheme"
       />
 
-  <!-- Publish static files -->
-  <plone:static
-      name="lakof.theme"
-      type="plone"
-      directory="static"
-      />
+
 
 <!--   <configure package="plone.app.layout">
     <browser:viewlet
