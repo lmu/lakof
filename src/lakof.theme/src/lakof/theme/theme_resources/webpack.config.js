@@ -17,7 +17,7 @@ const PLONE = new PlonePlugin({
   publicPath: PUBLICPATH,
   sourcePath: PATHS.src,
   momentLocales: ['de'],
-  debug: false
+  debug: true
 });
 
 const common = {

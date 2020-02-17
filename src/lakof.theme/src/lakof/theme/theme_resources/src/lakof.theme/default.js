@@ -10,18 +10,15 @@ if (jQuery('body.userrole-anonymous').length === 0) {
     import(/* webpackChunkName: "logged-in" */ './logged-in').then(
     () => jQuery(($) => setTimeout(() => registry.scan(document.body)))
   );
-  
-  /* Add extra bundles when needed */
-  // import(/* webpackChunkName: "pfgquickedit" */ 'pfgquickedit');
-  // import(/* webpackChunkName: "pfgquickedit" */ 'mosaic');
-  // import(/* webpackChunkName: "pfgquickedit" */ 'layouts-editor');
+  import(/* webpackChunkName: "mosaic" */ 'mosaic');
+  import(/* webpackChunkName: "layouts-editor" */ 'layouts-editor');
 }
 if (jQuery('body.userrole-anonymous').length > 0) {
   jQuery(($) => setTimeout(() => registry.scan(document.body)));
 }
 
 /* Expose jQuery when needed */
-// window.jQuery = jQuery;
+window.jQuery = jQuery;
 
 import requirejs from 'exports-loader?requirejs!script-loader!requirejs/require.js';
 requirejs.config({});  // the real configuration is loaded in webpack.xml
