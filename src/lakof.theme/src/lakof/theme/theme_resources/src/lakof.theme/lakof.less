@@ -1,8 +1,24 @@
 #portal-globalnav-wrapper {
     background-color: #8a0000 !important;
 }
+
+#portal-globalnav {
+    border-left: 1px solid #bbb;
+}
+
 #portal-globalnav li {
-    border-right: 1px solid #fff;
+    border-right: 1px solid #bbb;
+}
+
+.plone-nav li ul {
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    height: unset;
+}
+
+ul.dropdown li a {
+    border-right: 1px solid #bbb;
+    border-left: 1px solid #bbb;
+    border-bottom: 1px solid #bbb;
 }
 
 .plone-navbar-nav .has_subtree.inPath > a,
@@ -18,14 +34,14 @@
 }
 
 #portal-globalnav > li > a {
-    border-bottom: 3px solid #8a0000 !important;
+    border-bottom: 2px solid #8a0000 !important;
 }
 
 #portal-globalnav:hover > li > a:hover {
-    border-bottom: 3px solid #fff !important;
+    border-bottom: 2px solid #bbb !important;
 }
 #portal-globalnav > li.inPath > a {
-    border-bottom: 3px solid #fff !important;
+    border-bottom: 2px solid #bbb !important;
 }
 
 .plone-nav li a:hover, .plone-nav li a:focus {
@@ -37,7 +53,7 @@
 }
 
 #portal-breadcrumbs {
-    margin-top:5px;
+    margin-top: 5px;
     background: transparent;
 }
 
