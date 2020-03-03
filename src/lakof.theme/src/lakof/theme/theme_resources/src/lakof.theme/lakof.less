@@ -1,65 +1,69 @@
-// Navigation
+// All Navigation (including mobile)
 #portal-globalnav-wrapper {
     background-color: #8a0000 !important;
 }
 
-#portal-globalnav {
-    border-left: 1px solid #bbb;
+.plone-navbar-nav .current > a,
+.plone-navbar-nav .selected > a,
+.plone-navbar-nav .current > a:hover,
+.plone-navbar-nav .selected > a:hover,
+.plone-navbar-nav .current > a:focus,
+.plone-navbar-nav .selected > a:focus {
+    color: #333;
+    background-color: #eee !important;
 }
 
-#portal-globalnav li {
-    border-right: 1px solid #bbb;
-}
-
-.plone-nav li ul {
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-    height: unset;
-}
-
-ul.dropdown li a {
-    border-right: 1px solid #bbb;
-    border-left: 1px solid #bbb;
-    border-bottom: 1px solid #bbb;
-}
-
-.plone-navbar-nav .has_subtree.inPath > a,
-.plone-navbar-nav .has_subtree.inPath > a:hover,
-.plone-navbar-nav .has_subtree.inPath > a:focus,
-.plone-navbar-nav .has_subtree > a,
-.plone-navbar-nav .has_subtree > a:hover,
-.plone-navbar-nav .has_subtree > a:focus {
-    background: transparent;
-}
-
-#portal-globalnav > li > a {
-}
-
-#portal-globalnav > li > a {
-    border-bottom: 2px solid #8a0000 !important;
-}
-
-#portal-globalnav:hover > li > a:hover {
-    border-bottom: 2px solid #bbb !important;
-}
+#portal-globalnav:hover > li > a:hover,
 #portal-globalnav > li.inPath > a {
-    border-bottom: 2px solid #bbb !important;
+    background-color: #555 !important;
+    color: #FFF !important;
 }
 
-.plone-nav li a:hover, .plone-nav li a:focus {
-
+.plone-nav li a:hover,
+.plone-nav li a:focus {
+    color: #000;
+    background-color: #eee !important;
 }
+
 .plone-nav li ul li a {
     color: #8a0000;
-    background: #FFFFFF !important;
+    background: #FFFFFF;
 }
 
-#portal-breadcrumbs {
-    margin-top: 5px;
-    background: transparent;
+#mainnavigation .plone-nav li label::after {
+    background-color: #aaa;
 }
 
-#portal-breadcrumbs a {
-    border: 1px solid #e6e6e2;
+.plone-navbar-toggle:hover {
+    background-color: #555;
+    border-color: #ccc;
+}
+
+ // Large Navigation
+@media (min-width: 768px) {
+
+    #portal-globalnav {
+        border-left: 1px solid #bbb;
+    }
+
+    #portal-globalnav li {
+        border-right: 1px solid #bbb;
+    }
+
+    .plone-nav li ul {
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    }
+
+    ul.dropdown li a {
+        border-right: 1px solid #bbb;
+        border-left: 1px solid #bbb;
+        border-bottom: 1px solid #bbb;
+    }
+
+    #mainnavigation .plone-nav li label::after {
+        background-color: transparent;
+    }
+
 }
 
 // Search
