@@ -181,3 +181,67 @@ table > tfoot > tr > td {
 table.invisible {
     visibility: visible;
 }
+
+
+// Search page
+
+#searchform .input-group {
+    margin-bottom: 10px;
+}
+
+.searchPage .actionMenu {
+    position: absolute;
+    margin-top: 90px;
+    max-width: 300px;
+}
+
+.searchPage .actionMenu dt {
+    display: none !important;
+}
+
+.searchPage .actionMenu dd {
+    display: block !important;
+    position: relative !important;
+    width: auto !important;
+    right: 0 !important;
+    top: 0 !important;
+}
+
+.search-type-options > div {
+    display: block !important;
+}
+
+#search-results-wrapper {
+    margin-left: 320px;
+}
+
+@media (max-width: 888px) {
+    #search-results-wrapper {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 888px) {
+  .searchPage .actionMenu {
+    position: relative;
+    margin-top: 0;
+    max-width: auto;
+  }
+
+  .searchPage .actionMenu dt {
+      display: block !important;
+  }
+
+  .searchPage .actionMenu dd {
+      display: none !important;
+      position: relative !important;
+      width: auto !important;
+      right: 20px !important;
+      top: 20px !important;
+  }
+
+  .searchPage .actionMenu.activated dd {
+      display: block !important;
+  }
+
+}
