@@ -46,3 +46,5 @@ local/
 src/lakof.theme/src/lakof/theme/theme_resources/.plone/
 src/lakof.theme/src/lakof/theme/theme_resources/node_modules/
 .python-version
+*.hot-update.js
+*.hot-update.json
