@@ -1,0 +1,19 @@
+<a id="portal-logo" class="clearfix"
+   title="Home"
+   tal:attributes="href view/navigation_root_url;
+                   title view/navigation_root_title"
+   i18n:domain="plone"
+   i18n:attributes="title">
+    <img src="logo.png" alt=""
+         tal:attributes="alt view/logo_title;
+                         title view/logo_title;
+                         src view/img_src" />
+            <span id="logo_abbr_title">
+            LaKoF
+            </span>
+            <span id="logo_full_title">
+                <span>Landeskonferenz der</span>
+                <span>Frauen- und Gleichstellungsbeauftragten</span>
+                <span>an Bayerischen Hochschulen</span>
+            </span>
+</a>

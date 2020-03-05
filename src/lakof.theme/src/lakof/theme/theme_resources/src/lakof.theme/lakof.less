@@ -66,10 +66,46 @@
 
 }
 
+#portal-header {
+    margin-top:5px;
+    margin-bottom: 25px;
+}
+
 // Search
 #portal-header #portal-searchbox .searchSection {
     display: none;
 }
+
+// Logo and logo tag line
+
+a#portal-logo {
+    height: 70px;
+    display: block;
+    vertical-align: baseline;
+    color: #8a0000;
+    text-decoration: none;
+}
+
+a#portal-logo img {
+    height: 60px;
+    max-height: 60px;
+    vertical-align: unset;
+}
+
+a#portal-logo span#logo_abbr_title {
+    font-size: 70px;
+    font-weight: normal;
+}
+
+a#portal-logo span#logo_full_title {
+    display: inline-block;
+}
+
+a#portal-logo span#logo_full_title span {
+    display: block;
+    font-size: 16px;
+}
+
 
 // Mosaic
 .mosaic-tile {
@@ -215,6 +251,7 @@ table.invisible {
 }
 
 @media (max-width: 888px) {
+
     #search-results-wrapper {
         margin-left: 0;
     }
@@ -240,5 +277,14 @@ table.invisible {
   .searchPage .actionMenu.activated dd {
       display: block !important;
   }
+
+}
+
+@media (max-width: 768px) {
+
+    // Hide the tagline on mobile
+    #logo_full_title {
+        display: none !important;
+    }
 
 }
