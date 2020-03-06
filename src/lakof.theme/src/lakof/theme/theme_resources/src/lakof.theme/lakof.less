@@ -118,6 +118,12 @@ a#portal-logo span#logo_full_title span {
     font-size: 16px;
 }
 
+.portlet .portletContent > ul > li a {
+    color: #8a0000;
+}
+.portletNavigationTree .portletContent > ul > li a:hover::before {
+    color: #8a0000 !important;
+}
 
 // Mosaic
 .mosaic-tile {
@@ -165,6 +171,38 @@ a#portal-logo span#logo_full_title span {
 #portal-footer-wrapper a {
     color: #8a0000 !important;
 }
+
+#portal-footer .row + .site-actions {
+    border-top: 1px solid #8a0000;
+}
+
+#portal-footer .doormat h2 {
+    color: #8a0000;
+    font-size: 20px;
+}
+
+#portal-footer .doormat p {
+    color: #8a0000;
+}
+
+// Hide CT icons
+body#visual-portal-wrapper.pat-plone .outer-wrapper {
+    [class*="contenttype-"]:before{
+        content: none;
+    }
+}
+
+body#visual-portal-wrapper.pat-plone #edit-zone {
+    [class*="contenttype-"]:before{
+        content: none;
+    }
+}
+
+body [class*="contenttype-"]::before,
+body .contenttype-file #crud-edit-File-widgets-view_title::before {
+    content: none;
+}
+
 
 #category {
     text-align: right;
