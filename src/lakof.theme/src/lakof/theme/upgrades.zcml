@@ -38,4 +38,13 @@
     handler=".upgrades.fix_portlets"
     />
 
+  <genericsetup:upgradeStep
+    source="1004"
+    destination="1005"
+    title="Cleanup after Python 3 Migration: Fix filenames"
+    description=""
+    profile="lakof.theme:default"
+    handler=".upgrades.fix_filenames"
+    />
+
 </configure>

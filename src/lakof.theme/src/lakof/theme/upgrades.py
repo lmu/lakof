@@ -259,3 +259,28 @@ def fix_portlets_for(obj):
                             obj.absolute_url()
                         )
                     )  # noqa: E501
+
+
+def fix_filenames(context=None):
+    """Fix filenames if they are now '<built-in function id>'
+    """
+    for brain in api.content.find(portal_type='File'):
+        try:
+            obj = brain.getObject()
+        except KeyError:
+            log.info('Broken brain for {}'.format(brain.getPath()))
+            continue
+        if not obj.file:
+            continue
+        filename = obj.file.filename
+        if filename == '<built-in function id>':
+            obj.file.filename = obj.id
+            log.info(f'Fixed filename of {obj.absolute_url()}')
+        if obj.file.contentType == 'application/octet-stream' and '.pdf' in obj.id.lower():
+            obj.file.contentType = 'application/pdf'
+    mtr = api.portal.get_tool('mimetypes_registry')
+    for mtype in mtr.mimetypes():
+        if '++theme++plonetheme.onegov' in mtype.icon_path:
+            icon = mtype.icon_path.split('/')[-1]
+            icon = icon.replace('.gif', '.png')
+            mtype.icon_path = '++resource++mimetype.icons/' + icon
