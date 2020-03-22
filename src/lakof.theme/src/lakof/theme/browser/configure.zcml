@@ -11,17 +11,15 @@
       layer="lakof.theme.interfaces.ICustomTheme"
       />
 
-
-
-<!--   <configure package="plone.app.layout">
-    <browser:viewlet
-        name="plone.path_bar"
-        view="plone.app.layout.globals.interfaces.IViewView"
-        manager="plone.app.layout.viewlets.interfaces.IMainNavigation"
-        class="plone.app.layout.viewlets.common.PathBarViewlet"
-        layer="lakof.theme.interfaces.ICustomTheme"
-        permission="zope2.View"
-        />
-  </configure> -->
+  <browser:viewlet
+      name="lakof.leadimage.full"
+      for="*"
+      class=".viewlets.LeadImageViewlet"
+      manager="plone.app.layout.viewlets.interfaces.IAboveContent"
+      template="templates/decoration.pt"
+      view="plone.app.layout.globals.interfaces.IViewView"
+      layer="lakof.theme.interfaces.ICustomTheme"
+      permission="zope2.View"
+      />
 
 </configure>

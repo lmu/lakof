@@ -1,0 +1,6 @@
+<div class="container"
+     id="parent-fieldname-leadImage"
+     tal:define="tag python: view.body_tag()"
+     tal:condition="tag">
+    <img tal:replace="structure tag" src="" alt="" />
+</div>

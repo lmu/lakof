@@ -276,7 +276,7 @@ def fix_filenames(context=None):
         if filename == '<built-in function id>':
             obj.file.filename = obj.id
             log.info(f'Fixed filename of {obj.absolute_url()}')
-        if obj.file.contentType == 'application/octet-stream' and '.pdf' in obj.id.lower():
+        if 'octet' in obj.file.contentType and '.pdf' in obj.id.lower():
             obj.file.contentType = 'application/pdf'
     mtr = api.portal.get_tool('mimetypes_registry')
     for mtype in mtr.mimetypes():
