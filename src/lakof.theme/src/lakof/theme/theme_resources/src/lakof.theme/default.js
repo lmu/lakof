@@ -18,6 +18,8 @@ if (jQuery('div.mosaic-tile-content .slider').length >= 1) {
   import('./slider.js');
 }
 
+import('./accordion.js');
+
 if (jQuery('body.userrole-anonymous').length === 0) {
     import(/* webpackChunkName: "logged-in" */ './logged-in').then(
     () => jQuery(($) => setTimeout(() => registry.scan(document.body)))

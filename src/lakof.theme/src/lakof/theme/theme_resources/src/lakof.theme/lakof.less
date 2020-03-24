@@ -363,3 +363,65 @@ table.invisible {
     }
 
 }
+
+// Accordion
+
+ // Stolen from // stolen from https://codepen.io/brenden/pen/Kwbpyj
+
+ul.accordion {
+  list-style: none;
+  padding: 0;
+}
+ul.accordion .inner {
+  padding-left: 1em;
+  overflow: hidden;
+  display: none;
+}
+
+ul.accordion .inner.showpanel {
+    margin-top: 10px;
+    // display: block;
+}
+
+ul.accordion li {
+  margin: .5em 0;
+}
+#content ul.accordion li a.toggle {
+  width: 100%;
+  font-weight: bold;
+  display: block;
+  background: #8a0000;
+  color: #fff !important;
+  padding: .75em;
+  border-radius: 0.15em;
+  transition: background .3s ease;
+  position: relative;
+}
+
+#content ul.accordion li a.toggle:after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border: solid 6px;
+  border-color: transparent #fff transparent transparent;
+  position: absolute;
+  right: 30px;
+  top: 12px;
+}
+
+#content ul.accordion li a.toggle.active:after {
+  border-color: #fff transparent transparent transparent;
+  right: 25px;
+  top: 15px;
+}
+
+#content ul.accordion li a.toggle:hover,
+#content ul.accordion li a.toggle.active {
+  background: #c43131;
+  text-decoration: none;
+}
+
+#content ul.accordion {
+  padding-left: 0;
+}
