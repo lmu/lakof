@@ -1,0 +1,19 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="lakof.theme">
+
+  <utility
+      component=".register.registrationforms"
+      name="lakof.registrationforms"
+      />
+
+  <plone:behavior
+      title="Link to Registration Form"
+      description=""
+      name="lakof.register"
+      provides=".register.IRegister"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      />
+
+</configure>
