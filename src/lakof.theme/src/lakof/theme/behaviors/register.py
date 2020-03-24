@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+from plone import api
 from plone.autoform import directives
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
-from zope import schema
-from plone import api
 from z3c.form.browser.radio import RadioFieldWidget
+from zope import schema
 from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
@@ -16,10 +16,8 @@ class IRegister(model.Schema):
 
     directives.widget(register=RadioFieldWidget)
     register = schema.Choice(
-        title=u'Anmeldeformular',
-        vocabulary='lakof.registrationforms',
-        required=False,
-        )
+        title=u'Anmeldeformular', vocabulary='lakof.registrationforms', required=False,
+    )
 
 
 @provider(IVocabularyFactory)
