@@ -10,9 +10,13 @@ import(/* webpackChunkName: "mosaic" */ 'mosaic').then(
     () => jQuery(($) => setTimeout(() => registry.scan(document.body)))
   );
 
+if (jQuery('body.portaltype-easyform').length > 0) {
+  import('./easyform.js');
+}
+
 if (jQuery('div.mosaic-tile-content .slider').length >= 1) {
   import('./slider.js');
-};
+}
 
 if (jQuery('body.userrole-anonymous').length === 0) {
     import(/* webpackChunkName: "logged-in" */ './logged-in').then(
