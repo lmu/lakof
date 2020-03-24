@@ -27,6 +27,18 @@
       <tal:text content="structure data/text" />
     </div>
 
+    <tal:register condition="python:getattr(context.aq_base, 'register', None)">
+      <tal:def tal:define="results python:context.portal_catalog(UID=context.register);
+                           url python: results[0].getURL() if results else None;
+                           ">
+        <a class="context"
+           href="${url}?title=${python:context.title}"
+           tal:condition="url">
+          Zu dieser Veranstaltung anmelden!
+        </a>
+      </tal:def>
+    </tal:register>
+
   </div>
 
 </tal:def>
