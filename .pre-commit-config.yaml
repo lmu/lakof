@@ -21,7 +21,7 @@ repos:
       - id: debug-statements
       - id: fix-encoding-pragma
       - id: check-xml
-      - id: check-added-large-files
+      # - id: check-added-large-files
       - id: check-merge-conflict
       - id: double-quote-string-fixer
   - repo: https://github.com/pre-commit/mirrors-isort
