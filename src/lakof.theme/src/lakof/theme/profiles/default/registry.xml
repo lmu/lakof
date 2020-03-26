@@ -89,4 +89,21 @@
     </value>
   </record>
 
+  <record name="plone.other_settings"
+          interface="Products.CMFPlone.interfaces.controlpanel.ITinyMCESchema"
+          field="other_settings">
+    <value>{
+"style_formats" : [
+  {
+    "title" : "Accordion Heading",
+    "block" : "h2",
+    "attributes" : {
+      "class": "accordion"
+    }
+  }
+],
+"style_formats_merge": "True"}
+    </value>
+  </record>
+
 </registry>
