@@ -21,7 +21,7 @@ class LeadImageViewlet(ViewletBase):
         inherit_images = False
 
         width = 1420
-        height = 220
+        height = 300
         context = aq_inner(self.context)
 
         # maybe a smaller banner on mosaic frontpage

@@ -3,7 +3,7 @@
 
   <record interface="Products.CMFPlone.interfaces.controlpanel.ISiteSchema"
           name="plone.site_title" >
-    <value>Landeskonferenz der Frauen- und Gleichstellungsbeauftragten an Bayerischen Hochschulen</value>
+    <value>Landeskonferenz der Frauen- und Gleichstellungsbeauftragten an bayerischen Hochschulen</value>
   </record>
 
   <record name="plone.site_logo" interface="Products.CMFPlone.interfaces.controlpanel.ISiteSchema" field="site_logo">
