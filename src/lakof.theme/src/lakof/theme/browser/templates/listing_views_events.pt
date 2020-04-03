@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en"
+      lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="plone">
+
+  <body tal:define="results context;
+                    portal_state options/original_context/@@plone_portal_state;
+                    portal_url portal_state/portal_url;
+                    registry options/original_context/portal_registry;
+                    view_types python: registry.get('plone.types_use_view_action_in_listings', [])">
+
+    <div tal:repeat="item results">
+      <tal:block tal:define="item_url python: item.portal_type in view_types and item.getURL() + '/view' or item.getURL();
+                             item_title_or_id item/title_or_id;
+                             item_type item/Type;
+                             item_creator item/Creator;
+                             item_description item/Description;
+                             item_modified item/ModificationDate;
+                             item_start item/start;
+                             item_end item/end;
+                             item_whole_day item/whole_day | nothing;">
+        <div class="tileItem visualIEFloatFix">
+
+          <div class="documentByLine" tal:condition="python: item_start">
+              <span tal:condition="python: item_whole_day">
+                <span class="dtstart pat-moment"
+                      title="${python:item_start.isoformat()}"
+                      data-pat-moment="format:DD.MM.YYYY"
+                      data-date="${python: item_start.isoformat()}"
+                      >
+                  ${python: item_start.ctime()}
+                </span>
+              </span>
+              <span tal:condition="python: not item_whole_day">
+                <span class="dtstart pat-moment"
+                      title="${python:item_start.isoformat()}"
+                      data-pat-moment="format:DD.MM.YYYY, HH:mm"
+                      data-date="${python: item_start.isoformat()}"
+                      >
+                  ${python: item_start.ctime()}
+                </span>
+              </span>
+          </div>
+
+          <h2 class="tileHeadline"
+              metal:define-macro="listitem">
+            <a href="#"
+               class="summary url"
+               tal:attributes="href item_url"
+               tal:content="item_title_or_id">
+              Item Title
+            </a>
+          </h2>
+          <p class="tileFooter" tal:condition="python: item_type != 'Event'">
+            <a href=""
+               tal:attributes="href python:item_url"
+               i18n:translate="">
+              Mehr&hellip;
+            </a>
+          </p>
+          <div class="visualClear"><!-- --></div>
+        </div>
+      </tal:block>
+    </div>
+    <footer>
+      <a href="${portal_url}/aktuelles/termine">Alle Termine</a>
+    </footer>
+  </body>
+</html>

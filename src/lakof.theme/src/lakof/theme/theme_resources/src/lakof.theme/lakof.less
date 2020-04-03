@@ -213,8 +213,10 @@ div.leadImage {
     border-radius: 5px;
 }
 
-.mosaic-plone\.app\.standardtiles\.contentlisting-tile .mosaic-tile-content .documentByLine {
-    display: none;
+.mosaic-tile .documentByLine {
+    color: #696969;
+    font-weight: 400;
+    margin-bottom: 0;
 }
 
 .mosaic-plone\.app\.standardtiles\.contentlisting-tile .mosaic-tile-content dt {
@@ -224,6 +226,15 @@ div.leadImage {
     float: right;
     margin-bottom: 5px;
     border-radius: 0;
+}
+
+.mosaic-tile-content footer {
+  text-align: right;
+}
+
+h2.tileHeadline {
+    font-size: 18px;
+    line-height: 1.3em;
 }
 
 // Footer
@@ -250,6 +261,16 @@ div.leadImage {
 #portal-footer .doormat p {
     color: #8a0000;
     hyphens: auto;
+}
+
+.news-tile {
+    float: right;
+    margin: 0 0 0.5em 1em;
+}
+
+.news-tile img {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0;
 }
 
 // Hide CT icons
@@ -307,6 +328,11 @@ body .contenttype-file #crud-edit-File-widgets-view_title::before {
 table > tbody > tr:nth-child(2n+1) > td,
 table > tbody > tr:nth-child(2n+1) > th {
     background-color: #f6f6f6;
+}
+
+table.invisible-grid > tbody > tr:nth-child(2n+1) > td,
+table.invisible-grid > tbody > tr:nth-child(2n+1) > th {
+    background-color: transparent;
 }
 
 table > thead > tr > th,

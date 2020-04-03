@@ -22,4 +22,20 @@
       permission="zope2.View"
       />
 
+  <browser:page
+      name="listing_views_events"
+      for="*"
+      layer="plone.app.standardtiles.contentlisting.IContentListingTileLayer"
+      permission="zope2.View"
+      template="templates/listing_views_events.pt"
+      />
+
+  <browser:page
+      name="listing_views_news"
+      for="*"
+      layer="plone.app.standardtiles.contentlisting.IContentListingTileLayer"
+      permission="zope2.View"
+      template="templates/listing_views_news.pt"
+      />
+
 </configure>

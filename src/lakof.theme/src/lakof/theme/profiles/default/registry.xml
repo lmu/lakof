@@ -126,4 +126,11 @@
     </value>
   </record>
 
+  <record name="plone.app.standardtiles.listing_views">
+    <value purge="false">
+      <element key="listing_views_events">Termine Kachel</element>
+      <element key="listing_views_news">Nachrichten Kachel</element>
+    </value>
+  </record>
+
 </registry>
