@@ -93,16 +93,36 @@
           interface="Products.CMFPlone.interfaces.controlpanel.ITinyMCESchema"
           field="other_settings">
     <value>{
-"style_formats" : [
-  {
-    "title" : "Accordion Heading",
-    "block" : "h2",
-    "attributes" : {
-      "class": "accordion"
-    }
-  }
-],
-"style_formats_merge": "True"}
+"style_formats": [{"items": [{"format": "h1", "title": "Header 1"},
+                              {"format": "h2", "title": "Header 2"},
+                              {"format": "h3", "title": "Header 3"},
+                              {"format": "h4", "title": "Header 4"},
+                              {"format": "h5", "title": "Header 5"},
+                              {"format": "h6", "title": "Header 6"}],
+                    "title": "Headers"},
+                   {"title": "Accordion Heading", "block" : "h2", "attributes" : {"class": "accordion"}},
+                   {"items": [{"format": "p", "title": "Paragraph"},
+                              {"format": "blockquote", "title": "Blockquote"},
+                              {"format": "div", "title": "Div"},
+                              {"format": "pre", "title": "Pre"}],
+                    "title": "Block"},
+                   {"items": [{"format": "bold", "icon": "bold", "title": "Bold"},
+                              {"format": "italic", "icon": "italic", "title": "Italic"},
+                              {"format": "underline", "icon": "underline", "title": "Underline"},
+                              {"format": "strikethrough", "icon": "strikethrough", "title": "Strikethrough"},
+                              {"format": "superscript", "icon": "superscript", "title": "Superscript"},
+                              {"format": "subscript", "icon": "subscript", "title": "Subscript"},
+                              {"format": "code", "icon": "code", "title": "Code"}],
+                    "title": "Inline"},
+                   {"items": [{"format": "alignleft", "icon": "alignleft", "title": "Left"},
+                              {"format": "aligncenter", "icon": "aligncenter", "title": "Center"},
+                              {"format": "alignright", "icon": "alignright", "title": "Right"},
+                              {"format": "alignjustify", "icon": "alignjustify", "title": "Justify"}],
+                    "title": "Alignment"},
+                   {"items": [{"classes": "listing", "selector": "table", "title": "Listing"},
+                              {"classes": "invisible-grid", "selector": "table", "title": "Invisible Grid"}],
+                    "title": "Tables"}]
+}
     </value>
   </record>
 
