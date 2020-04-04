@@ -27,7 +27,7 @@
              tal:condition="item_has_image"
              tal:attributes="href item_url">
             <img tal:condition="item_has_image"
-                 tal:attributes="src string:${item/getURL}/@@images/image/thumb"
+                 tal:attributes="src string:${item/getURL}/@@images/image/tile"
                  alt=""/>
           </a>
           <div class="documentByLine" tal:condition="python: item_type == 'News Item'">
@@ -67,7 +67,7 @@
       </tal:block>
     </div>
     <footer>
-      <a href="${portal_url}/aktuelles/termine">Alle Nachrichten</a>
+      <a href="${portal_url}/aktuelles/nachrichten">Alle Nachrichten</a>
     </footer>
 
   </body>
