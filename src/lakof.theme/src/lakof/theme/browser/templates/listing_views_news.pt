@@ -7,6 +7,7 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       i18n:domain="plone">
   <body tal:define="portal_state options/original_context/@@plone_portal_state;
+                    plone_view options/original_context/@@plone;
                     portal_url portal_state/portal_url;">
     <div tal:define="results context;
                      registry options/original_context/portal_registry;
@@ -32,11 +33,7 @@
           </a>
           <div class="documentByLine" tal:condition="python: item_type == 'News Item'">
               <span class="documentModified">
-                  <span tal:content="item_modified"
-                        class="pat-moment"
-                        data-pat-moment="format:DD.MM.YYYY">
-                  August 16, 2001 at 23:35:59
-                </span>
+                <span tal:content="python: plone_view.toLocalizedTime(item.EffectiveDate())"></span>
               </span>
           </div>
           <h2 class="tileHeadline"
