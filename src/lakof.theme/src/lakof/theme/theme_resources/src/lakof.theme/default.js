@@ -14,6 +14,8 @@ if (jQuery('body.portaltype-easyform').length > 0) {
   import('./easyform.js');
 }
 
+() => jQuery(($) => setTimeout(() => registry.scan(document.body)))
+
 import('./accordion.js');
 
 if (jQuery('body.userrole-anonymous').length === 0) {
