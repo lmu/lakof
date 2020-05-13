@@ -28,6 +28,7 @@ if (jQuery('body.userrole-anonymous').length > 0) {
 
 /* Expose jQuery when needed */
 window.jQuery = jQuery;
+window.jquery = jQuery;
 
 import requirejs from 'exports-loader?requirejs!script-loader!requirejs/require.js';
 requirejs.config({});  // the real configuration is loaded in webpack.xml
