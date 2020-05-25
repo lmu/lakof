@@ -26,6 +26,10 @@ if (jQuery('body.userrole-anonymous').length > 0) {
   jQuery(($) => setTimeout(() => registry.scan(document.body)));
 }
 
+if (jQuery('body.template-search').length > 0) {
+  jQuery(($) => setTimeout(() => registry.scan(document.body)));
+}
+
 /* Expose jQuery when needed */
 window.jQuery = jQuery;
 window.jquery = jQuery;
