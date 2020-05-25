@@ -21,7 +21,7 @@
         <article class="tileItem">
 
           <p class="tileDate" tal:condition="python:item_type == 'News Item'">
-              ${python: plone_view.toLocalizedTime(context.Date())}
+              ${python: plone_view.toLocalizedTime(obj.Date())}
           </p>
 
           <h2 class="tileHeadline" metal:define-macro="listitem">
