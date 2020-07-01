@@ -30,7 +30,7 @@ def prepare_plone5_upgrade(context=None):
             if obj is not None:
                 api.content.delete(obj, check_linkintegrity=False)
             log.info('Deleted %s' % path)
-        except:  # noqa: F401
+        except:  # noqa: E722
             continue
 
     # Remove ftw.slider
