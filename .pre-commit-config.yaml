@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 19.10b0
+    rev: 20.8b1
     hooks:
       - id: black
-        language_version: python 3.7
+        language_version: python 3.8
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.1.0
+    rev: v3.2.0
     hooks:
       - id: debug-statements
       - id: fix-encoding-pragma
@@ -14,7 +14,7 @@ repos:
       - id: check-merge-conflict
       - id: double-quote-string-fixer
   - repo: https://gitlab.com/pycqa/flake8
-    rev: '3.8.3'
+    rev: 3.8.3
     hooks:
       - id: flake8
         args: [--config=.flake8]
@@ -28,7 +28,7 @@ repos:
           - flake8-mutable
           - flake8-tidy-imports
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v4.3.21
+    rev: v5.5.1
     hooks:
       - id: isort
         additional_dependencies:

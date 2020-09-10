@@ -16,7 +16,9 @@ class IRegister(model.Schema):
 
     directives.widget(register=RadioFieldWidget)
     register = schema.Choice(
-        title=u'Anmeldeformular', vocabulary='lakof.registrationforms', required=False,
+        title=u'Anmeldeformular',
+        vocabulary='lakof.registrationforms',
+        required=False,
     )
 
 

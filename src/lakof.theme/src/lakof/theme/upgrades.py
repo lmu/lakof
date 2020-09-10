@@ -212,8 +212,7 @@ def cleanup_afterpy3_migration(context=None):
 
 
 def fix_portlets(context=None):
-    """Fix navigation_portlet (has ComputedValue for portal instead of a UUID)
-    """
+    """Fix navigation_portlet (has ComputedValue for portal instead of a UUID)"""
     catalog = api.portal.get_tool('portal_catalog')
     portal = api.portal.get()
     fix_portlets_for(portal)
@@ -262,8 +261,7 @@ def fix_portlets_for(obj):
 
 
 def fix_filenames(context=None):
-    """Fix filenames if they are now '<built-in function id>'
-    """
+    """Fix filenames if they are now '<built-in function id>'"""
     for brain in api.content.find(portal_type='File'):
         try:
             obj = brain.getObject()
