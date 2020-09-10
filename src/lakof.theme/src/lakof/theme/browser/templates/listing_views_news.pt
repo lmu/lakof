@@ -28,7 +28,7 @@
              tal:condition="item_has_image"
              tal:attributes="href item_url">
             <img tal:condition="item_has_image"
-                 tal:attributes="src string:${item/getURL}/@@images/image/tile"
+                 tal:attributes="src string:${item/getURL}/@@images/image/mini"
                  alt=""/>
           </a>
           <div class="documentByLine" tal:condition="python: item_type == 'News Item'">
