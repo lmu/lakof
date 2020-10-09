@@ -14,7 +14,7 @@ repos:
       - id: check-merge-conflict
       - id: double-quote-string-fixer
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.3
+    rev: 3.8.4
     hooks:
       - id: flake8
         args: [--config=.flake8]
@@ -28,7 +28,7 @@ repos:
           - flake8-mutable
           - flake8-tidy-imports
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.5.1
+    rev: v5.6.1
     hooks:
       - id: isort
         additional_dependencies:
