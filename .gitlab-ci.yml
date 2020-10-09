@@ -6,8 +6,9 @@ before_script:
     - ln -fs local_ci.cfg local.cfg
     - ./bin/develop up -f || true
     - /usr/bin/pipenv run buildout -t 3 || /usr/bin/pipenv run buildout -v
-job1:
+
+test:
   script:
      - export DISPLAY=:99
-     - ./bin/pre-commit run -a
+     - /usr/bin/pipenv run pre-commit run -a
      - ./bin/test
