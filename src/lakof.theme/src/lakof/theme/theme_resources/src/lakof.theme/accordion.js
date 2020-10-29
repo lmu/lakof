@@ -27,15 +27,20 @@ jQuery(document).ready(function() {
         // 3. Handle headers in document order
         jQuery(search_headers).each(function(i) {
             // optionally open first item
-            if (i == 0) {
-                header_klass = 'toggle active'
-                inner_klass = 'inner showpanel'
-                inner_style = 'style="display: block;"'
-            } else {
-                header_klass = 'toggle'
-                inner_klass = 'inner'
-                inner_style = ''
-            };
+            // if (i == 0) {
+            //     header_klass = 'toggle active'
+            //     inner_klass = 'inner showpanel'
+            //     inner_style = 'style="display: block;"'
+            // } else {
+            //     header_klass = 'toggle'
+            //     inner_klass = 'inner'
+            //     inner_style = ''
+            // };
+
+            // all elements are closed
+            header_klass = 'toggle'
+            inner_klass = 'inner'
+            inner_style = ''
 
             // Turn header to link
             header = '<li><a class="' + header_klass + '" href="javascript:void(0);">' + jQuery(this).text() + '</a>';
