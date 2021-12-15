@@ -7,7 +7,7 @@ verify_ssl = true
 
 [packages]
 pre-commit = "==2.6.0"
-"zc.buildout" = "==2.13.3"
+"zc.buildout" = "==2.13.4"
 # TODO
 # https://github.com/pypa/pipenv/issues/2364
 # Force install with pipenv install "setuptools==42.0.2"
