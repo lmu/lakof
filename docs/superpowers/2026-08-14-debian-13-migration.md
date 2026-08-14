@@ -1,0 +1,350 @@
+# Migrationsplan: Debian 11 → 13 bei Erhalt von Plone 5.2.10
+
+**Stand: 14.08.2026** · Server `lmkwitg-fblmu01.srv.mwn.de` (SSH-Alias `lakof`) ·
+Website <https://www.lakof-bayern.de/>
+
+Arbeitsdokument und Momentaufnahme. Es hält fest, was am 14.08.2026 vorgefunden,
+entschieden und getan wurde, und wird nicht rückwirkend umgeschrieben — spätere
+Entscheidungen bekommen ein eigenes Dokument.
+
+---
+
+## 1. Anlass
+
+Debian 11 (bullseye) erreicht am **31.08.2026** das Ende des LTS-Supports. Das LRZ hat
+angekündigt, die VM abzuschalten, wenn sie nicht auf eine unterstützte Version gehoben
+wird. Am Tag dieses Dokuments bleiben **17 Tage**.
+
+Die Aufgabe lautet: Debian aktualisieren, **ohne** dass die Plone-Website ausfällt.
+
+---
+
+## 2. Ausgangslage
+
+### 2.1 System
+
+| | |
+|---|---|
+| OS | Debian 11.11 (bullseye), Kernel 5.10.0-46 |
+| Hardware | 1 vCPU, 3,8 GB RAM, **kein Swap**, 100 GB Platte (20 % belegt) |
+| Plattform | VMware (open-vm-tools), LRZ-verwaltet über Paket `lrz-base` 6.4.3 |
+| Paketquellen | `debian.mirror.lrz.de` — debian, debian-security, debian-lrz |
+| Firewall | UFW aktiv: 80/443 offen, 22 nur aus LMU-Netzen |
+| Monitoring | SplunkForwarder, `update-debian.sh` via `lrz-base.timer` (2×/Tag) |
+
+### 2.2 Plone
+
+Entgegen der ursprünglichen Annahme läuft Plone hier **nicht** auf Python 2.7:
+
+| | |
+|---|---|
+| Plone | 5.2.10 |
+| Zope | 4.8.3 |
+| **Python** | **3.9.2** — das System-Python von Debian 11 |
+| Eggs | 265 Stück unter `/usr/local/buildout-cache/eggs/cp39/` |
+| Topologie | ZEO-Server (9090) + zeoclient1 (9082) + zeoclient2 (9083) |
+| Prozessverwaltung | Supervisor mit `memmon`/`httpok` aus `superlance` |
+| Add-ons | `lakof.theme` (Diazo, in `src/`), `plone.app.mosaic` 2.2.5, `collective.easyform` 3.0.5 |
+| Buildout | `/opt/Plone/buildout.lakof`, auf Basis `starzel/buildout` 5.2.10 |
+| Daten | `/srv/Plone/buildout.lakof/lakof` — Data.fs 100 MB, blobstorage 1,1 GB |
+| Frontend | Apache 2.4 als Reverse Proxy, `VirtualHostBase`-Rewrite auf 9082 |
+| Zertifikat | Let's Encrypt, `lakof-bayern.de` + `www.`, gültig bis 27.09.2026 |
+
+Python 2.7 findet sich nur noch im **Supervisor-venv** `/usr/local/venv-supervisor`
+(Python 2.7.16, `supervisor` + `superlance`). Das ist ein Prozessmanager, kein
+Anwendungscode.
+
+Der Serverstand des Buildouts entspricht bitgenau dem Commit `e662c30` dieses
+Repositorys — geprüft am 14.08.2026. Der Buildout ist damit vollständig
+rekonstruierbar.
+
+### 2.3 Der Bruchpunkt
+
+Das Buildout-venv zeigt über `/opt/Plone/buildout.lakof/bin/python3` auf
+`/usr/bin/python3` — also auf das System-Python. Damit gilt:
+
+- Debian 11 liefert Python **3.9** — die letzte Debian-Version, die das tut
+- Debian 12 liefert Python **3.11**
+- Debian 13 liefert Python **3.13**
+
+Plone 5.2 unterstützt laut [Release Schedule](https://plone.org/download/release-schedule)
+offiziell Python 2.7 und 3.8; dass es hier auf 3.9 läuft, ist ein *gemessener*
+Ist-Zustand, keine zugesicherte Kombination. Auf 3.11 oder 3.13 läuft Zope 4 nicht.
+
+**Ein Distributions-Upgrade zerstört die Plone-Installation, solange der Interpreter
+nicht vom System entkoppelt ist.** Das ist der Kern dieser Migration.
+
+Zusätzlich: `python2.7` existiert in Debian 12 nicht mehr — das Supervisor-venv muss
+vor dem ersten Sprung ersetzt werden.
+
+### 2.4 Vorgefundene Mängel
+
+Unabhängig vom Debian-Thema:
+
+1. **Keine laufende Datensicherung.** Der Cron-Eintrag
+   `#37 2 * * * .../bin/backup --quiet` ist auskommentiert; das letzte reguläre Backup
+   stammt vom **14.12.2021**. Ein TSM-Client ist nicht installiert. Einziges jüngeres
+   Artefakt: ein manuelles `db_lakof_20250219.tar` — auf derselben Platte wie die
+   Produktivdaten.
+2. **Plone 5.2 ist end of life.** Security-Support endete am **31.10.2024**. Die
+   Instanz läuft seit rund 22 Monaten ohne Sicherheitsaktualisierungen.
+3. **Drei konkurrierende Update-Automatiken:** ein von Ansible eingetragener
+   stündlicher `apt upgrade -y` in der root-Crontab, `update-debian.sh` 2×/Tag über
+   `lrz-base`, dazu `apt-daily`/`apt-daily-upgrade`. Zusätzlich ein automatischer
+   Reboot Mo–Fr 07:00.
+4. **Rechteproblem im Backup-Baum.** `/opt/Plone/buildout.lakof/backup/lakof` gehört
+   `plone_buildout` mit `drwxr-xr-x`; der als `plone_daemon` laufende Backup-Cron
+   könnte dort gar nicht schreiben. Das ist vermutlich der Grund, warum er abgeschaltet
+   wurde.
+5. **Kein Rollback.** Weder VMware-Snapshot noch TSM verfügbar.
+6. **Alarmmails** aus `memmon` gehen an `team@starzel.de` — die externe Agentur.
+7. **Altlasten** (~2,8 GB): `db_lakof_20250219.tar`, zwei `lakof.tar.gz`, `db.tgz`,
+   die cp37m-Eggs eines früheren Python-3.7-Stands, sowie eine verirrte 13-MB-Logdatei
+   namens `disable` im Buildout-Wurzelverzeichnis.
+
+---
+
+## 3. Entscheidungen
+
+| Frage | Entscheidung | Begründung |
+|---|---|---|
+| Plone 6 jetzt? | **Nein** — Brücke bauen | Migration 5.2 → 6.x mit Diazo-Theme, Mosaic und EasyForm ist in 17 Tagen nicht seriös abnehmbar |
+| Interpreter | **uv-verwaltetes Python 3.9** (python-build-standalone) | Portabel gegen alte glibc, läuft unverändert auf Debian 11, 12 und 13 |
+| Container? | **Später** | Sauberer, aber unter Zeitdruck zu viele bewegliche Teile; wird mit der Plone-6-Migration zusammengelegt |
+| OS-Ziel | **Debian 13 (trixie)** | Debian 12 ist bereits aus dem regulären Support; ein Halt dort führte binnen Monaten zur nächsten Mahnung |
+| Reihenfolge | **Plone zuerst entkoppeln, OS danach** | Andernfalls ist Plone nach dem ersten Sprung tot und wird unter Zeitdruck auf unbekanntem System repariert |
+| Sicherungsziel | Arbeitsrechner, `/Volumes/Data2/lakof-migration/` | Kein TSM, kein Snapshot; sofort verfügbar |
+
+### Zielarchitektur
+
+```
+Debian 13 (trixie)              System-Python 3.13  ── von Plone nicht genutzt
+  │
+  ├─ /opt/python/cpython-3.9.x-linux-x86_64-gnu   (uv, portabel)
+  │      └─ /opt/Plone/buildout.lakof/bin/python3
+  │              ├─ zeoserver   127.0.0.1:9090
+  │              ├─ zeoclient1  127.0.0.1:9082
+  │              └─ zeoclient2  127.0.0.1:9083
+  │
+  ├─ Supervisor  ── Python 3, nicht mehr das 2.7-venv
+  └─ Apache 2.4  ── unverändert
+```
+
+Unverändert bleiben: Datenverzeichnis, Apache-Vhosts, Let's Encrypt, Ports, die
+Benutzer `plone_daemon` und `plone_buildout`. Der Eingriff beschränkt sich darauf,
+**worauf der Interpreter zeigt**.
+
+---
+
+## 4. Phasenplan
+
+| Phase | Inhalt | Umkehrbar | Stand |
+|---|---|---|---|
+| 0 | Sicherung, Aufräumen, Automatik zähmen | — | teilweise erledigt |
+| 1 | Machbarkeitsnachweis an einer Kopie, Nebenports | folgenlos | offen |
+| 2 | Produktion auf uv-Python 3.9 umstellen (noch Debian 11) | ✅ | offen |
+| 3 | Supervisor vom Python-2.7-venv lösen | ✅ | offen |
+| 4 | Debian 11 → 12, Buildout neu bauen, prüfen | ❌ | offen |
+| 5 | Debian 12 → 13, Buildout neu bauen, prüfen | ❌ | offen |
+| 6 | Aufräumen, Datensicherung dauerhaft einschalten, dokumentieren | — | offen |
+
+**Phase 2 ist die tragende Absicherung.** Sie ist der letzte umkehrbare Schritt, weil
+das alte, gegen `/usr/bin/python3.9` gebaute venv unangetastet daneben liegen bleibt.
+Erst wenn Plone nachweislich auf dem uv-Interpreter läuft, wird das unumkehrbare
+OS-Upgrade angefasst.
+
+### Phase 0 — Stand 14.08.2026
+
+**Erledigt:**
+
+- Systeminventar: Paketstände (`dpkg --get-selections`, `apt-mark showmanual`),
+  Crontabs aller Nutzer, systemd-Timer, UFW-Regeln, Netzkonfiguration, Dienste
+- Konsistente ZODB-Sicherung über `bin/snapshotbackup` — erst `repozo` auf Data.fs,
+  dann `rsync` der Blobs. Diese Reihenfolge stellt sicher, dass jeder von Data.fs
+  referenzierte Blob in der Sicherung vorhanden ist. Kein Dienst wurde gestoppt,
+  keine Downtime.
+- Archive erzeugt, auf den Arbeitsrechner übertragen, Größen gegen den Server geprüft:
+
+  | Archiv | Größe |
+  |---|---:|
+  | `lakof-zodb-snapshot-2026-08-14.tar.gz` | 1,07 GB |
+  | `lakof-buildout-cache-2026-08-14.tar.gz` | 564 MB |
+  | `lakof-buildout-2026-08-14.tar.gz` | 32 MB |
+  | `lakof-venv-supervisor-2026-08-14.tar.gz` | 8,4 MB |
+  | `lakof-etc-2026-08-14.tar.gz` | 731 KB |
+
+  Serverseitig unter `/var/tmp/lakof-migration-2026-08-14/`, lokal unter
+  `/Volumes/Data2/lakof-migration/2026-08-14/`, jeweils mit `SHA256SUMS`.
+
+- **Sicherung verifiziert:** alle fünf SHA-256-Prüfsummen der lokalen Kopien stimmen
+  mit den serverseitig erzeugten überein. Die Sicherung ist damit bestätigt und trägt
+  als Rückfalllinie für die Phasen 4 und 5.
+
+**Offen:**
+
+- **Update-Automatik zähmen:**
+
+  ```
+  # root-Crontab, die beiden von Ansible eingetragenen Zeilen auskommentieren:
+  #   @hourly apt upgrade -y
+  #   @hourly apt update
+  mv /etc/cron.d/lrz-base-automatic-reboot{,.disabled-lakof-migration}
+  systemctl disable --now lrz-base-automatic-reboot.timer
+  ```
+
+  Der Ist-Zustand ist in `automation-state-before.txt` protokolliert, die
+  Original-Crontab in `root-crontab.orig`. Das LRZ-Monitoring (`lrz-base.timer`)
+  bleibt bewusst aktiv, damit die VM beim LRZ nicht als ungepflegt gilt; es wird erst
+  für die eigentlichen Upgrade-Fenster stillgelegt und danach sofort wieder
+  eingeschaltet.
+
+### Phase 1 — Machbarkeitsnachweis
+
+Auf derselben VM, in einem eigenen Verzeichnis, ohne Berührung der Produktion:
+
+1. `uv` bereitstellen und `uv python install 3.9` nach `/opt/python` legen.
+   Verfügbar ist derzeit CPython **3.9.25**. Falls der Server GitHub nicht erreicht,
+   wird das Tarball vom Arbeitsrechner hochgeladen.
+2. Kopie des Buildouts anlegen, venv gegen den uv-Interpreter erzeugen.
+3. `bin/buildout` gegen den lokalen `buildout-cache` laufen lassen.
+4. Instanz auf **Nebenports** starten, gegen eine Kopie der ZODB.
+5. Prüfen: Startet Zope? Rendert die Startseite? Greift das Diazo-Theme? Funktionieren
+   Mosaic-Seiten und EasyForm-Formulare? Läuft die Anmeldung?
+
+**Dies ist der Punkt, an dem der Plan steht oder fällt.** Trägt er nicht, muss auf den
+Container-Weg umgeschwenkt werden — und das will man wissen, solange noch Zeit dafür
+ist.
+
+Zu beobachten: die C-Extensions. Ein Teil der Eggs ist gegen
+Debian-11-Systembibliotheken gelinkt, vor allem `lxml` (libxml2/libxslt, für Diazo
+unverzichtbar) und `Pillow`. Nach jedem OS-Sprung müssen diese entweder neu übersetzt
+werden — dafür `build-essential` plus die passenden `-dev`-Pakete — oder durch
+manylinux-Wheels für cp39 ersetzt werden, die ihre Bibliotheken mitbringen.
+
+### Phase 2 — Produktion umstellen
+
+1. Wartungsfenster ankündigen.
+2. Supervisor-Gruppe stoppen.
+3. Bestehendes venv als `bin.debian-python39` beiseitelegen — **nicht löschen**.
+4. venv gegen den uv-Interpreter neu erzeugen, Buildout laufen lassen.
+5. Dienste starten, Prüfliste abarbeiten.
+6. Bei Fehlschlag: zurück auf das alte venv, Dienste starten, neu bewerten.
+
+### Phase 3 — Supervisor lösen
+
+Das venv `/usr/local/venv-supervisor` läuft auf Python 2.7, das es in Debian 12 nicht
+mehr gibt. Zwei Wege:
+
+- **Debian-Paket `supervisor`** (Python 3). Einfach, aber `superlance` — Quelle von
+  `memmon` und `httpok` — muss separat bereitgestellt werden.
+- **venv auf Python 3 neu aufbauen** mit `supervisor` + `superlance` aus PyPI. Näher am
+  Bestand, hält die `eventlistener`-Konfiguration unverändert.
+
+Zu klären: ob `superlance` in einer Fassung vorliegt, die zu einem aktuellen Supervisor
+passt. Bei dieser Gelegenheit sollte die Empfängeradresse der Alarmmails von
+`team@starzel.de` auf eine LMU-Adresse gezogen werden.
+
+### Phasen 4 und 5 — die Distributions-Upgrades
+
+Nach LRZ-Doku ([Debian-VM](https://doku.lrz.de/debian-vm-11481178.html),
+[auf 12](https://doku.lrz.de/upgrade-auf-debian-12-bookworm-35882194.html),
+[auf 13](https://doku.lrz.de/upgrade-auf-debian-13-trixie-1921298568.html)). Ein
+Direktsprung von 11 auf 13 ist nicht unterstützt.
+
+Je Schritt:
+
+1. `etckeeper` installieren, damit `/etc`-Änderungen nachvollziehbar bleiben.
+2. Sicherung auffrischen und **abziehen**.
+3. Automatik vollständig stilllegen, einschließlich `lrz-base.timer` und `cron`.
+4. `apt update && apt full-upgrade` auf dem alten Stand, dann Reboot.
+5. Paketquellen umschreiben.
+6. `apt upgrade --without-new-pkgs`, dann `apt full-upgrade`, dann Reboot.
+7. Buildout neu bauen, Dienste prüfen.
+8. Automatik wieder einschalten.
+
+**Fallstricke aus der LRZ-Doku, die hier zutreffen:**
+
+*Auf Debian 12:*
+
+- `systemd-resolved` ist ein eigenes Paket geworden und wird **nicht** automatisch
+  mitinstalliert. Es ist vor dem `full-upgrade` explizit zu installieren, sonst fällt
+  die Namensauflösung aus. Auf lakof läuft `systemd-resolved` — der Fall trifft zu.
+- Neue Komponente `non-free-firmware` in den Paketquellen ergänzen.
+- LRZ-Repo-Schlüssel auf `signed-by` umstellen.
+- PEP 668 verbietet ab Python 3.11 `pip` in den globalen Interpreter. Für uns ohne
+  Belang, da Plone in einem venv auf eigenem Interpreter läuft.
+
+*Auf Debian 13:*
+
+- Neuer LRZ-GPG-Schlüssel, Fingerabdruck
+  `A0D98AE0F9140A82D8E1D209ECB9C1905AD42837`, Ablage unter `/usr/share/keyrings`.
+- Der TSM-Client zieht von `non-free` in eine eigene Komponente `tsm` um.
+- **`/tmp` wird tmpfs**, standardmäßig bis zur Hälfte des RAM. Bei 3,8 GB und ohne Swap
+  ist das ernst zu nehmen: Zope legt temporäre Dateien dort ab. Verhalten nach dem
+  Reboot prüfen, notfalls über `systemctl edit tmp.mount` begrenzen oder `tmp.mount`
+  maskieren.
+- Erwartete Endstände: Kernel `6.12.41+deb13`, `/etc/debian_version` = `13.0`.
+- Anschließend `apt modernize-sources` auf das deb822-Format.
+
+**Zusätzlich für lakof:**
+
+- Vor dem Reboot sicherstellen, dass ein **zweiter Zugangsweg** besteht (LRZ-Konsole
+  über vSphere). SSH oder UFW können durch das Upgrade unbrauchbar werden, und die
+  VPN-Strecke ist erfahrungsgemäß nicht verlässlich.
+- Apache-Konfiguration prüfen: `Order deny,allow` und `Deny from all` stammen aus
+  `mod_access_compat` und sind seit Langem abgekündigt.
+- `certbot` über den Versionswechsel im Auge behalten; das Zertifikat läuft am
+  27.09.2026 ab.
+- Nicht am Freitag. Zwischen den beiden Sprüngen mindestens einen Werktag Beobachtung.
+
+### Phase 6 — Nacharbeiten
+
+- **Datensicherung dauerhaft einschalten.** Rechteproblem aus 2.4 (4) beheben, den
+  `bin/backup`-Cron reaktivieren, TSM beim LRZ beantragen. Ein Backup, das nicht läuft,
+  ist keines.
+- Altlasten entfernen (~2,8 GB), inklusive der verirrten `disable`-Datei.
+- `/etc` unter `etckeeper` belassen.
+- Alarmmails auf eine LMU-Adresse umstellen.
+- Betriebsdokumentation in `docs/` schreiben.
+
+---
+
+## 5. Restrisiken
+
+| Risiko | Wirkung | Umgang |
+|---|---|---|
+| Kein Rollback für Phase 4/5 | Bei Fehlschlag Neuaufbau statt Rückkehr | Sicherung so vollständig, dass eine frische VM daraus rekonstruierbar ist |
+| C-Extensions brechen nach OS-Sprung | Plone startet nicht | In Phase 1 vorab klären; Wheels als Ausweichweg |
+| Nur 1 vCPU, 3,8 GB RAM, kein Swap | Buildout-Läufe langsam; `/tmp` als tmpfs in Trixie kritisch | Läufe einplanen; `tmp.mount` nach dem Upgrade prüfen |
+| VPN-Abrisse | Arbeitsschritte brechen mitten im Lauf ab | Lange Läufe in `screen`/`tmux`; zweiter Zugangsweg |
+| Plone 5.2 ohne Security-Support | Bleibt auch nach der Brücke bestehen | Zeitlich befristen — siehe Abschnitt 6 |
+| Python 3.9 ist selbst EOL (seit Okt. 2025) | dito | dito |
+
+---
+
+## 6. Nach der Brücke
+
+Die Brücke rettet die Frist, sie behebt nicht die Substanz: Plone 5.2 und Python 3.9
+sind beide abgekündigt. Der Anschluss sollte terminiert werden, nicht vertagt.
+
+Zielbild ist **Plone 6.x**. Bemerkenswert ist dabei, dass **Plone 6.0 die Python-Spanne
+3.9 bis 3.13 abdeckt** — es ist damit die einzige Version, die sowohl auf dem
+eingefrorenen 3.9 als auch auf dem System-Python von Debian 13 läuft. Das erlaubt, die
+Plone-Migration und den Interpreter-Wechsel voneinander zu trennen, statt beides in
+einem Schritt zu wagen:
+
+1. Auf dem uv-Python 3.9 von Plone 5.2.10 auf 6.0 migrieren.
+2. Danach den Interpreter auf das System-Python 3.13 heben.
+3. Erst dann auf 6.1 oder 6.2 nachziehen.
+
+Alle Plone-6-Minor-Versionen haben Security-Support bis **31.12.2027**.
+
+---
+
+## 7. Verweise
+
+- LRZ: [Debian-VM](https://doku.lrz.de/debian-vm-11481178.html) ·
+  [Upgrade auf 12](https://doku.lrz.de/upgrade-auf-debian-12-bookworm-35882194.html) ·
+  [Upgrade auf 13](https://doku.lrz.de/upgrade-auf-debian-13-trixie-1921298568.html)
+- Plone: [Release Schedule und Policy](https://plone.org/download/release-schedule)
+- Debian: [Release Notes bookworm](https://www.debian.org/releases/bookworm/amd64/release-notes/)
