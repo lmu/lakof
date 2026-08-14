@@ -110,7 +110,7 @@ Unabhängig vom Debian-Thema:
 |---|---|---|
 | Plone 6 jetzt? | **Nein** — Brücke bauen | Migration 5.2 → 6.x mit Diazo-Theme, Mosaic und EasyForm ist in 17 Tagen nicht seriös abnehmbar |
 | Interpreter | **uv-verwaltetes Python 3.8.20** (python-build-standalone) | Portabel (nur GLIBC_2.2.5), läuft unverändert auf Debian 11, 12 und 13. Zu 3.9 siehe unten |
-| Plone-Stand | **5.2.15** statt 5.2.10 | Letzte 5.2-Veröffentlichung, enthält alle Sicherheitskorrekturen bis zum Ende des Security-Supports |
+| Plone-Stand | **5.2.10 bleibt** für die Brücke | Nur eine Variable wechseln. Der Sprung auf 5.2.15 ist erprobt und funktioniert im Kern, brachte aber zwei Viewlet-Regressionen; er folgt nach der Frist als eigener Schritt. Siehe [ADR 0001](../adr/0001-python-38-fuer-die-debian-bruecke.md) |
 | Container? | **Später** | Sauberer, aber unter Zeitdruck zu viele bewegliche Teile; wird mit der Plone-6-Migration zusammengelegt |
 | OS-Ziel | **Debian 13 (trixie)** | Debian 12 ist bereits aus dem regulären Support; ein Halt dort führte binnen Monaten zur nächsten Mahnung |
 | Reihenfolge | **Plone zuerst entkoppeln, OS danach** | Andernfalls ist Plone nach dem ersten Sprung tot und wird unter Zeitdruck auf unbekanntem System repariert |
