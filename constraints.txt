@@ -1,3 +1,9 @@
-setuptools==42.0.2
-zc.buildout==2.13.8
-wheel==0.37.1
+# Buildout tooling, matching the [versions:python3] section of
+# https://dist.plone.org/release/5.2.15/versions.cfg
+#
+# These must agree with what Plone pins, or zc.buildout keeps upgrading
+# itself and restarting in an endless loop. Plone 5.2.15 pins different
+# versions for Python 2.7 and Python 3; we build on Python 3.
+setuptools==65.7.0
+zc.buildout==3.0.1
+wheel==0.38.4

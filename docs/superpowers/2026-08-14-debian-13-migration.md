@@ -109,18 +109,31 @@ Unabhängig vom Debian-Thema:
 | Frage | Entscheidung | Begründung |
 |---|---|---|
 | Plone 6 jetzt? | **Nein** — Brücke bauen | Migration 5.2 → 6.x mit Diazo-Theme, Mosaic und EasyForm ist in 17 Tagen nicht seriös abnehmbar |
-| Interpreter | **uv-verwaltetes Python 3.9** (python-build-standalone) | Portabel gegen alte glibc, läuft unverändert auf Debian 11, 12 und 13 |
+| Interpreter | **uv-verwaltetes Python 3.8.20** (python-build-standalone) | Portabel (nur GLIBC_2.2.5), läuft unverändert auf Debian 11, 12 und 13. Zu 3.9 siehe unten |
+| Plone-Stand | **5.2.15** statt 5.2.10 | Letzte 5.2-Veröffentlichung, enthält alle Sicherheitskorrekturen bis zum Ende des Security-Supports |
 | Container? | **Später** | Sauberer, aber unter Zeitdruck zu viele bewegliche Teile; wird mit der Plone-6-Migration zusammengelegt |
 | OS-Ziel | **Debian 13 (trixie)** | Debian 12 ist bereits aus dem regulären Support; ein Halt dort führte binnen Monaten zur nächsten Mahnung |
 | Reihenfolge | **Plone zuerst entkoppeln, OS danach** | Andernfalls ist Plone nach dem ersten Sprung tot und wird unter Zeitdruck auf unbekanntem System repariert |
 | Sicherungsziel | Arbeitsrechner, `/Volumes/Data2/lakof-migration/` | Kein TSM, kein Snapshot; sofort verfügbar |
+
+**Warum 3.8 und nicht 3.9:** Zope 4.8.x deklariert `Requires-Python >=2.7, …, <3.9` und
+schließt Python 3.9 damit ausdrücklich aus. Dass die Produktion trotzdem seit Jahren auf
+3.9 läuft, liegt allein daran, dass das dort verwendete Werkzeugpaar
+(`zc.buildout 2.13.8` / `setuptools 42.0.2`) das Feld nicht auswertete. Der von Plone
+5.2.15 für Python 3 verlangte `zc.buildout 3.0.1` wertet es aus und verweigert die
+Installation. Statt die Grenze weiter zu umgehen, gehen wir auf die letzte Version, für
+die alle Metadaten stimmen.
+
+Folge für später: Plone 6.0 verlangt Python ≥3.9. Der Weg zu Plone 6 umfasst daher einen
+Interpreter-Wechsel; er lässt sich nicht wie ursprünglich gedacht auf demselben
+Interpreter fahren.
 
 ### Zielarchitektur
 
 ```
 Debian 13 (trixie)              System-Python 3.13  ── von Plone nicht genutzt
   │
-  ├─ /opt/python/cpython-3.9.x-linux-x86_64-gnu   (uv, portabel)
+  ├─ /opt/python/cpython-3.8.20-linux-x86_64-gnu   (uv, portabel, GLIBC_2.2.5)
   │      └─ /opt/Plone/buildout.lakof/bin/python3
   │              ├─ zeoserver   127.0.0.1:9090
   │              ├─ zeoclient1  127.0.0.1:9082
@@ -198,7 +211,79 @@ OS-Upgrade angefasst.
   für die eigentlichen Upgrade-Fenster stillgelegt und danach sofort wieder
   eingeschaltet.
 
-### Phase 1 — Machbarkeitsnachweis
+### Phase 1 — Machbarkeitsnachweis · durchgeführt am 14.08.2026
+
+Aufbau unter `/opt/Plone/buildout.lakof-test`, eigener Egg-Cache
+(`/opt/buildout-cache-test`), Ports 91xx statt 90xx, eigenes `var/`. Die Produktion
+blieb durchgehend erreichbar und wurde zu keinem Zeitpunkt angefasst.
+
+**Was trägt:**
+
+| Prüfung | Ergebnis |
+|---|---|
+| Portabler Interpreter | CPython 3.8.20 via uv, benötigt nur **GLIBC_2.2.5** — Debian 11/12/13 liefern 2.31/2.36/2.41. Damit ist die OS-Unabhängigkeit **gemessen**, nicht angenommen |
+| Buildout-Lauf | fehlerfrei; alle Skripte und parts erzeugt |
+| C-Extensions | kommen als **manylinux-Wheels** (BTrees, persistent, cffi …), bringen ihre Bibliotheken mit und sind damit OS-unabhängig. Das ursprünglich größte Restrisiko entfällt weitgehend |
+| Plone-Start mit Produktionsdaten | Instanz startet, Startseite rendert (HTTP 200), `@@ok` liefert OK |
+| ZODB-Upgrade 5.2.10 → 5.2.15 | Probelauf und echter Lauf fehlerfrei: fünf Schritte, Profil 5218 → 5223, „Your Plone instance is now up-to-date" |
+| Theme und Add-ons | `lakof.theme` aktiv, EasyForm und Mosaic installiert |
+
+**Drei Befunde, die den Bau zunächst verhinderten** — alle behoben und im Repository
+festgehalten:
+
+1. **`constraints.txt` pinnte die Python-2.7-Werkzeuge.** Plone 5.2.15 pinnt
+   `zc.buildout`/`setuptools`/`wheel` getrennt nach `[versions:python27]` und
+   `[versions:python3]`; bei 5.2.10 gab es nur den einen Satz. Mit den alten Werten
+   upgradete Buildout sich endlos selbst und startete neu (38 Durchläufe, bis der
+   Prozess gestoppt wurde). Korrigiert auf `setuptools==65.7.0`, `zc.buildout==3.0.1`,
+   `wheel==0.38.4`.
+2. **Zope 4.8 verlangt Python <3.9** — führte zur Entscheidung für 3.8, siehe oben.
+3. **`collective.easyform 3.0.5` hat ein defektes Wheel auf PyPI**: Es ist
+   `py2-none-any` getaggt, offenbar unter Python 2 gebaut. Auf Python 3 fällt der Bau
+   deshalb auf das sdist zurück; modernes setuptools benennt das Egg dann nach PEP 625
+   `collective_easyform-…`, während zc.buildout `collective.easyform-…` sucht — der
+   Lauf endet in einem `AssertionError`. 3.0.4 davor und 3.1.0 bis 3.2.1 danach haben
+   korrekte `py3`-Wheels. Pin auf **3.2.1** gehoben, die letzte 3.x mit
+   Plone-5.2-Deklaration.
+
+**Was noch nicht trägt — offen vor Phase 2:**
+
+Nach dem Upgrade auf 5.2.15 brechen **zwei Viewlets**, die in der Produktion (5.2.10)
+fehlerfrei rendern:
+
+```
+error while rendering lakof.leadimage.full
+error while rendering plone.htmlhead.socialtags
+```
+
+Die Seite liefert weiterhin HTTP 200 und den vollständigen Inhalt; es fehlen das
+Kopfbild und die Open-Graph-Metadaten. Beide Viewlets erzeugen Bildskalierungen.
+Eingegrenzt ist bisher:
+
+- Die Skalierung selbst funktioniert: `getMultiAdapter((obj, request), name='images')`
+  und `scale('image', width=1420, height=300, direction='down')` liefern ein gültiges
+  `ImageScale` samt `<img>`-Tag.
+- `Pillow 6.2.2` ist im Test identisch ausgestattet wie in der Produktion (jpg, zlib,
+  libtiff, webp, freetype2 jeweils vorhanden).
+- `plone.scale` ist in 5.2.10 und 5.2.15 dieselbe Version (3.1.2).
+- **`ILeadImage.providedBy(obj)` liefert `False`** für die Startseite, obwohl das
+  Objekt ein `NamedBlobImage` trägt. Das Viewlet in
+  `src/lakof.theme/src/lakof/theme/browser/viewlets.py` überspringt das Objekt deshalb.
+  Ob daraus der Renderfehler folgt oder ob er im Template `decoration.pt` entsteht, ist
+  noch nicht geklärt.
+
+Ein Traceback ließ sich bisher nicht gewinnen: `plone.app.viewletmanager` fängt
+Viewlet-Fehler ab, das Plone-Fehlerprotokoll bleibt leer, und auch mit `debug-mode on`
+erscheint nur der Kommentar im HTML.
+
+**Nebenbefund:** Das Event-Log der Instanz landet in einer Datei namens `disable` im
+Arbeitsverzeichnis des jeweiligen Client-Parts. Ursache ist eine Fehlkonfiguration —
+`plone.recipe.zope2instance` nimmt den Wert der Option als *Dateinamen*, wo jemand das
+Log abschalten wollte. Das erklärt die 13-MB-Datei `disable` im Wurzelverzeichnis des
+Produktions-Buildouts und den Umstand, dass es keine `instance.log` gibt. Gehört in
+Phase 6 geradegezogen.
+
+### Phase 1 — ursprünglicher Plan (zur Nachvollziehbarkeit)
 
 Auf derselben VM, in einem eigenen Verzeichnis, ohne Berührung der Produktion:
 
