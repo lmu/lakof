@@ -502,17 +502,40 @@ Je Schritt:
 Die Brücke rettet die Frist, sie behebt nicht die Substanz: Plone 5.2 und Python 3.9
 sind beide abgekündigt. Der Anschluss sollte terminiert werden, nicht vertagt.
 
-Zielbild ist **Plone 6.x**. Bemerkenswert ist dabei, dass **Plone 6.0 die Python-Spanne
-3.9 bis 3.13 abdeckt** — es ist damit die einzige Version, die sowohl auf dem
-eingefrorenen 3.9 als auch auf dem System-Python von Debian 13 läuft. Das erlaubt, die
-Plone-Migration und den Interpreter-Wechsel voneinander zu trennen, statt beides in
-einem Schritt zu wagen:
-
-1. Auf dem uv-Python 3.9 von Plone 5.2.10 auf 6.0 migrieren.
-2. Danach den Interpreter auf das System-Python 3.13 heben.
-3. Erst dann auf 6.1 oder 6.2 nachziehen.
+Zielbild ist **Plone 6.2 Classic UI** — der direkte Nachfolger der bestehenden Oberfläche,
+ohne den zusätzlichen Bruch, den ein Wechsel auf Volto bedeuten würde.
 
 Alle Plone-6-Minor-Versionen haben Security-Support bis **31.12.2027**.
+
+### Nächster Schritt: Machbarkeit lokal prüfen (Stand 15.08.2026, noch offen)
+
+Der Versuch findet **auf dem Arbeitsrechner** statt, gegen die verifizierte Sicherung vom
+14.08.2026 unter `/Volumes/Data2/lakof-migration/`. Kein Zeitdruck, kein Produktionsrisiko,
+und ein Scheitern kostet nichts außer Rechenzeit.
+
+Was dabei zu klären ist:
+
+- **Der Interpreter wechselt mit.** Plone 6.2 verlangt Python 3.10 bis 3.14 — das
+  eingefrorene 3.8 trägt nicht mehr. Der Test läuft also auf einem aktuellen Python, und
+  die Brücke aus ADR 0001 endet mit dieser Migration.
+- **Der Upgrade-Pfad der ZODB.** Von Profil 5218 (Plone 5.2.10) auf den Stand von 6.2 sind
+  es deutlich mehr Schritte als die fünf, die wir beim Probelauf auf 5.2.15 gesehen haben.
+  Ob `plone.app.upgrade` den Sprung in einem Rutsch trägt oder ob Zwischenstationen nötig
+  sind, ist die erste Frage.
+- **`lakof.theme`** ist ein Diazo-Theme gegen Barceloneta 5. Barceloneta 6 hat eine andere
+  Struktur; das Theme wird angepasst werden müssen. Die Viewlets in
+  `src/lakof.theme/src/lakof/theme/browser/` gehören mitgeprüft — insbesondere
+  `lakof.leadimage.full`, das auf `ILeadImage` und die Bildskalierung zugreift.
+- **Add-ons:** `plone.app.mosaic` und `collective.easyform` brauchen Fassungen für
+  Plone 6. Bei easyform ist die 3.x-Reihe für 5.2; für Plone 6 gibt es neuere Hauptversionen.
+- **Buildout oder pip?** Plone 6 wird üblicherweise nicht mehr über zc.buildout aufgesetzt.
+  Ob der bestehende Buildout mitwandert oder durch ein schlankeres Setup ersetzt wird, ist
+  eine Entscheidung, die dieser Versuch vorbereiten soll.
+
+Verwendbar ist die Vorarbeit zu 5.2.15 aus Phase 1: die korrigierten Werkzeug-Pins in
+`constraints.txt`, der easyform-Hinweis in `floating_versions_project.cfg` und die
+Erkenntnis, dass `plone.restapi` 8.x zur Plone-6-Linie gehört — was beim Sprung auf 6.2
+kein Problem mehr ist, sondern die richtige Wahl wird.
 
 ---
 

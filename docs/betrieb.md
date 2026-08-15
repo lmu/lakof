@@ -171,11 +171,45 @@ echo test | mail -s "[lakof] Test" Alexander.Loechel@verwaltung.uni-muenchen.de
 sudo journalctl -u postfix --since "-2 minutes" | grep status=
 ```
 
+## Konfigurationsverwaltung
+
+**Diese Maschine wird derzeit von keiner Infrastructure-as-Code verwaltet.** Änderungen an
+`/etc`, an Diensten und an der Supervisor-Konfiguration erfolgen von Hand und müssen hier
+dokumentiert werden — sonst existieren sie nur auf der Maschine und sind beim nächsten
+Neuaufbau verloren. Genau daher stammten fast alle Probleme, die bei der Migration im
+August 2026 auftauchten: das Backup, das nicht schreiben konnte, das Event-Log in einer
+Datei namens `disable`, die fünf ungepinnten Versionen.
+
+Historisch richtete das Playbook `lakof.yml` aus
+[lmu.ansible.playbooks](https://github.com/lmu/lmu.ansible.playbooks) den Server ein. Das
+Repository wird **nicht mehr aktiv eingesetzt**; die letzte Spur eines Laufs auf dieser
+Maschine stammt von September 2025.
+
+> **Warnung:** Wer das Playbook wieder gegen lakof laufen lässt, beschädigt die
+> Installation. Drei Stellen sind seit der Migration nicht mehr stimmig:
+>
+> - `roles/zc.buildout` ruft `python3 -m venv` fest verdrahtet auf und ignoriert den
+>   übergebenen `python`-Parameter. Auf Debian 13 entstünde ein venv gegen Python 3.13 —
+>   Plone 5.2 startet darauf nicht. Derzeit greift der Task nur deshalb nicht, weil er ein
+>   `creates: bin/activate` trägt und das vorhandene venv ihn überspringen lässt.
+> - Dieselbe Rolle installiert die Anforderungen mit `state: latest` statt mit den
+>   gepinnten Versionen — und hebelt damit aus, was der Abschnitt *Versions-Pins* absichert.
+> - `lakof.yml` legt die Datei `disable` aktiv an (`state: touch`) und schreibt damit die
+>   Event-Log-Fehlkonfiguration fest, die wir behoben haben. Die Supervisor-Vorlage
+>   `files/supervisord_lakof.conf` setzt außerdem die Alarmadresse auf die der Agentur
+>   zurück.
+
+Wer die Verwaltung wieder aufnimmt, sollte diese drei Punkte zuerst geradeziehen.
+
 ## Update-Automatik
 
 Das LRZ aktualisiert die VM über `/etc/cron.d/lrz-base` (täglich 2 und 12 Uhr sowie nach
 jedem Boot) und startet bei Kernel-Updates automatisch neu — Mo–Fr zwischen 07:00 und
-07:30. Vor größeren Eingriffen ist beides stillzulegen:
+07:30. Die root-Crontab ist leer: Die beiden stündlichen `apt`-Läufe, die das alte
+Ansible-Playbook dort eingetragen hatte, waren zu alledem redundant und wurden am
+15.08.2026 entfernt.
+
+Vor größeren Eingriffen ist die Automatik stillzulegen:
 
 ```bash
 sudo systemctl stop cron
