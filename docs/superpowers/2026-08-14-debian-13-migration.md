@@ -454,8 +454,18 @@ Je Schritt:
   können*; jemand hat daraufhin die Cron-Zeile stillgelegt statt die Ursache zu suchen.
   Behoben durch `g+w` samt setgid auf dem Backup-Baum, verifiziert mit einem Probelauf
   als `plone_daemon`. Der Cron-Eintrag läuft wieder täglich um 02:37.
-- **Update-Automatik reaktiviert** (`lrz-base`, `apt-daily*`, `cron`). Der automatische
-  Reboot bleibt vorerst aus, solange der neue Stand beobachtet wird.
+- **Update-Automatik vollständig reaktiviert**: `lrz-base`, `lrz-base-kernel-check`,
+  `apt-daily`, `apt-daily-upgrade`, `certbot`, `cron` — und der **automatische Reboot**
+  (`/etc/cron.d/lrz-base-automatic-reboot`, Mo–Fr 07:00 mit 30 Minuten Streuung). Zum
+  Zeitpunkt der Reaktivierung stand kein Reboot an, und der laufende Kernel war der
+  neueste installierte. Die eigentliche Update-Arbeit erledigt `/etc/cron.d/lrz-base`
+  (täglich 2 und 12 Uhr sowie nach jedem Boot); die gleichnamigen systemd-Timer zeigen
+  deshalb kein `NEXT`, was bereits vor der Migration so war.
+- **Noch stillgelegt:** die beiden von Ansible eingetragenen Zeilen in der root-Crontab
+  (`@hourly apt upgrade -y` und `@hourly apt update`). Sie sind redundant zur
+  LRZ-Automatik, und ein stündliches unbeaufsichtigtes Upgrade ist unüblich. Da sie aus
+  einem Ansible-Playbook stammen, kehren sie beim nächsten Lauf zurück — die Entscheidung
+  gehört daher ins Playbook, nicht in die Crontab.
 - **Status-Panel eingerichtet.** `terminal-status-panel` 0.7.0 als systemweites uv-Tool
   unter `/opt/uv-tools`, Einbindung über `/etc/profile.d/zz-terminal-status-panel.sh` mit
   dem Panel `server`. Das Snippet prüft `case $- in *i*)` und bleibt bei nicht-interaktiven
@@ -463,9 +473,10 @@ Je Schritt:
 
 **Weiterhin offen:**
 
-- **TSM beim LRZ beantragen.** Die Paketquelle ist vorbereitet, der Client heißt
-  `tivsm-ba`. Die lokale Sicherung liegt auf derselben Platte wie die Produktivdaten und
-  ersetzt keine Offsite-Sicherung.
+- **TSM** ist beantragt, die Beschaffung liegt bei einem anderen Administrator (Stand
+  15.08.2026). Die Paketquelle auf lakof ist vorbereitet, der Client heißt `tivsm-ba`.
+  Bis dahin gilt: Die lokale Sicherung liegt auf derselben Platte wie die Produktivdaten
+  und ersetzt keine Offsite-Sicherung.
 - Altlasten entfernen (~2,8 GB), inklusive der verirrten `disable`-Datei.
 - `/etc` unter `etckeeper` belassen.
 - Alarmmails auf eine LMU-Adresse umstellen.
