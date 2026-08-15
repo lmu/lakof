@@ -1,3 +1,13 @@
+# Buildout tooling, matching what Plone 5.2.10 pins:
+# https://dist.plone.org/release/5.2.10/versions.cfg
+#
+# These must agree with what Plone pins, or zc.buildout keeps upgrading itself
+# and restarting in an endless loop.
+#
+# Note for a later move to 5.2.15: that release pins the tooling separately for
+# Python 2.7 and Python 3. Building on Python 3 then requires
+# setuptools==65.7.0, zc.buildout==3.0.1, wheel==0.38.4 instead of the values
+# below. See docs/superpowers/2026-08-14-debian-13-migration.md.
 setuptools==42.0.2
 zc.buildout==2.13.8
 wheel==0.37.1
