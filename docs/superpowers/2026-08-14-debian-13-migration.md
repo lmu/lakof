@@ -306,7 +306,68 @@ unverzichtbar) und `Pillow`. Nach jedem OS-Sprung müssen diese entweder neu üb
 werden — dafür `build-essential` plus die passenden `-dev`-Pakete — oder durch
 manylinux-Wheels für cp39 ersetzt werden, die ihre Bibliotheken mitbringen.
 
-### Phase 2 — Produktion umstellen
+### Phasen 2 bis 5 — durchgeführt in der Nacht vom 14. auf den 15.08.2026
+
+Alle vier Schritte sind erledigt. Der Endstand:
+
+| | vorher | nachher |
+|---|---|---|
+| Betriebssystem | Debian 11.11 | **Debian 13.6 (trixie)** |
+| Kernel | 5.10.0-46 | 6.12.101+deb13 |
+| System-Python | 3.9.2 | 3.13.5 |
+| glibc | 2.31 | 2.41 |
+| Plone-Interpreter | System-Python 3.9.2 | **portables CPython 3.8.20** aus `/opt/python` |
+| Prozessmanager | Supervisor 4.2.1 auf Python 2.7.16 | **Supervisor 4.3.0 auf Python 3.8** |
+| Plone | 5.2.10, Zope 4.8.3 | unverändert 5.2.10, Zope 4.8.3 |
+| Website | 26.266 Bytes, 0 Renderfehler | **identisch** |
+
+**Was sich bewährt hat.** Der portable Interpreter hat *beide* Distributionswechsel
+unverändert überstanden — von glibc 2.31 über 2.36 auf 2.41. Das war die tragende Wette
+des Plans, und sie ist aufgegangen; am System-Python wäre Plone zweimal gestorben.
+
+Phase 3 zahlte sich unmittelbar aus: Nach dem Reboot auf Debian 12 lief der Supervisor
+sofort. Das alte Python-2.7-venv wäre dort ins Leere gelaufen, denn `python2.7` gibt es ab
+Debian 12 nicht mehr — und ohne Prozessmanager wäre auch Plone unten geblieben.
+
+**Der eine Bruch.** Nach dem Sprung auf Debian 12 starteten die Zope-Clients nicht:
+
+```
+ImportError: libtiff.so.5: cannot open shared object file
+  ← Pillow-6.2.2-py3.8-linux-x86_64.egg/PIL/_imaging
+```
+
+`Pillow` war gegen Debian 11s `libtiff.so.5` und `libwebp.so.6` gelinkt; Debian 12 liefert
+`.so.6` und `.so.7`. Von **18 Eggs mit C-Extensions war genau dieses eine betroffen** — die
+übrigen linken nur gegen glibc und libstdc++ und sind damit abwärtskompatibel. Behoben
+durch Entfernen des Eggs aus dem Cache und einen Buildout-Lauf, Dauer unter fünf Minuten.
+
+Beim zweiten Sprung trat der Fehler **nicht** erneut auf: Trixie führt dieselben SONAMEs
+wie Bookworm. Plone lief nach dem Reboot sofort.
+
+Hier bewährten sich die Versions-Pins: Nach dem Neubau liefen exakt dieselben Paketstände
+wie vorher. Ohne sie wäre nicht zu unterscheiden gewesen, ob ein Fehler vom Betriebssystem
+oder von stillschweigend gewechselten Paketen kommt.
+
+**Weitere Beobachtungen**
+
+- Das Paket-Upgrade auf Debian 12 hat die zuvor stillgelegten Timer (`lrz-base`,
+  `apt-daily*`) **wieder aktiviert**. Vor dem zweiten Sprung mussten sie erneut
+  abgeschaltet werden; wer das übersieht, bekommt mitten im `full-upgrade` einen zweiten
+  apt-Lauf.
+- `python2.7` blieb als verwaistes Debian-11-Paket zurück und wurde entfernt. Weitere Reste
+  (`libssl1.1`, `libruby2.7`, `python3.9-*`) hängen noch an Abhängigkeiten und blieben
+  bewusst stehen.
+- In Debian 13 wird `/tmp` standardmäßig ein tmpfs im RAM. Bei 3,8 GB ohne Swap wären das
+  bis zu 1,9 GB, die Plone fehlen — und Zope legt beim Hochladen temporäre Kopien dort ab.
+  `tmp.mount` wurde vor dem Reboot maskiert, `/tmp` bleibt auf der Platte.
+- Bei den dpkg-Rückfragen wurden die lokalen Fassungen von `/etc/sudoers` (enthält
+  `%sudo ALL=(ALL:ALL) NOPASSWD: ALL`) und `/etc/default/ufw` behalten. Mit den
+  Paketvarianten wäre der passwortlose Verwaltungszugang verloren gewesen.
+- `apt modernize-sources` überführte die Quellen ins deb822-Format, verlor dabei aber die
+  LRZ-Komponente `tsm`. Sie wurde in `/etc/apt/sources.list.d/lrz.sources` ergänzt, damit
+  der Backup-Client `tivsm-ba` installierbar bleibt.
+
+### Phase 2 — ursprünglicher Plan (zur Nachvollziehbarkeit)
 
 1. Wartungsfenster ankündigen.
 2. Supervisor-Gruppe stoppen.
@@ -384,9 +445,27 @@ Je Schritt:
 
 ### Phase 6 — Nacharbeiten
 
-- **Datensicherung dauerhaft einschalten.** Rechteproblem aus 2.4 (4) beheben, den
-  `bin/backup`-Cron reaktivieren, TSM beim LRZ beantragen. Ein Backup, das nicht läuft,
-  ist keines.
+**Erledigt am 15.08.2026:**
+
+- **Datensicherung läuft wieder — erstmals seit dem 14.12.2021.** Die Ursache war nie der
+  auskommentierte Cron-Eintrag, sondern ein Rechteproblem darunter: Der Backup-Lauf
+  gehört `plone_daemon`, das Zielverzeichnis aber `plone_buildout:plone_group` mit
+  `drwxr-xr-x` — die Gruppe durfte nicht schreiben. Es *hätte gar nicht funktionieren
+  können*; jemand hat daraufhin die Cron-Zeile stillgelegt statt die Ursache zu suchen.
+  Behoben durch `g+w` samt setgid auf dem Backup-Baum, verifiziert mit einem Probelauf
+  als `plone_daemon`. Der Cron-Eintrag läuft wieder täglich um 02:37.
+- **Update-Automatik reaktiviert** (`lrz-base`, `apt-daily*`, `cron`). Der automatische
+  Reboot bleibt vorerst aus, solange der neue Stand beobachtet wird.
+- **Status-Panel eingerichtet.** `terminal-status-panel` 0.7.0 als systemweites uv-Tool
+  unter `/opt/uv-tools`, Einbindung über `/etc/profile.d/zz-terminal-status-panel.sh` mit
+  dem Panel `server`. Das Snippet prüft `case $- in *i*)` und bleibt bei nicht-interaktiven
+  Sitzungen still — `scp` und `rsync` wurden gegengeprüft. Laufzeit 1,2 s.
+
+**Weiterhin offen:**
+
+- **TSM beim LRZ beantragen.** Die Paketquelle ist vorbereitet, der Client heißt
+  `tivsm-ba`. Die lokale Sicherung liegt auf derselben Platte wie die Produktivdaten und
+  ersetzt keine Offsite-Sicherung.
 - Altlasten entfernen (~2,8 GB), inklusive der verirrten `disable`-Datei.
 - `/etc` unter `etckeeper` belassen.
 - Alarmmails auf eine LMU-Adresse umstellen.
