@@ -1,0 +1,8 @@
+# Warn by mail when a filesystem fills up.
+# See /usr/local/sbin/check-disk-usage.sh - it keeps quiet unless usage crosses
+# 80 percent, and then only speaks up again every further 5 points.
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin
+MAILTO=""
+
+17 6 * * *	root	/usr/local/sbin/check-disk-usage.sh
